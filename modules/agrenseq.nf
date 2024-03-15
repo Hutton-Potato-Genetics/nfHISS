@@ -1,5 +1,5 @@
 process CountKmers {
-    container 'kmc'
+    container 'https://depot.galaxyproject.org/singularity/kmc:3.2.1--hf1761c0_2'
     cpus 4
     memory { 8.GB * task.attempt }
     time '1h'
@@ -29,7 +29,7 @@ process CreatePresenceMatrix {
 }
 
 process NLRParser {
-    conda 'meme=5.4.1=py310pl5321h9f004f7_2'
+    container 'https://depot.galaxyproject.org/singularity/meme:5.5.2--py39pl5321h290edd5_0'
     cpus 4
     memory { 4.GB * task.attempt }
     input:
