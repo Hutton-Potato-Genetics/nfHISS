@@ -29,7 +29,7 @@ process CreatePresenceMatrix {
 }
 
 process NLRParser {
-    container 'https://depot.galaxyproject.org/singularity/meme:5.5.2--py39pl5321h290edd5_0'
+    conda 'meme=5.5.5'
     cpus 4
     memory { 4.GB * task.attempt }
     input:
