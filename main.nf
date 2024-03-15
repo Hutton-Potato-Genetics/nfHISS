@@ -210,10 +210,9 @@ workflow drenseq {
 }
 
 workflow {
-    if params.workflow == "agrenseq" {
-        agrenseq()
-    }
-    elif params.workflow == "drenseq" {
-        drenseq()
+    switch (params.workflow) {
+        case "agrenseq": agrenseq()
+        case "drenseq": drenseq()
+        default: fail("Unknown workflow: ${params.workflow}")
     }
 }
