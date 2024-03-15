@@ -1,5 +1,5 @@
-include 'modules/agrenseq.nf'
-include 'modules/drenseq.nf'
+include { agrenseq } from './modules/agrenseq.nf'
+include { drenseq } from './modules/drenseq.nf'
 
 help_message = """
 Needin' some help? ------------------------------------------------------------
