@@ -1,11 +1,6 @@
 include { agrenseq } from './modules/agrenseq.nf'
 include { drenseq } from './modules/drenseq.nf'
 
-params.workflow = ''
-params.reference = ''
-params.reads = ''
-params.bed = 'some.bed'
-
 help_message = """
 Needin' some help? ------------------------------------------------------------
 
@@ -30,9 +25,12 @@ workflow {
     switch (params.workflow) {
         case "agrenseq":
             agrenseq()
+            break
         case "drenseq":
             drenseq()
+            break
         default:
             error("Unknown workflow: ${params.workflow}")
+            break
     }
 }
