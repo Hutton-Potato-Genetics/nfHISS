@@ -33,12 +33,12 @@ process NLRParser {
     cpus 4
     memory { 4.GB * task.attempt }
     input:
-    path assembly
+    path reference
     output:
     path 'nlrparser.txt'
     script:
     """
-    NLR_Parser.sh -t ${task.cpus} -i $assembly -o nlrparser.txt
+    NLR_Parser.sh -t ${task.cpus} -i $reference -o nlrparser.txt
     """
 }
 
@@ -49,14 +49,14 @@ process RunAssociation {
     publishDir 'results'
     input:
     path presence_matrix
-    path assembly
+    path reference
     path phenotype
     path nlrparser
     output:
     path 'agrenseq_result.txt'
     script:
     """
-    RunAssociation.sh -i $presence_matrix -n $nlrparser -p $phenotype -a $assembly -o agrenseq_result.txt
+    RunAssociation.sh -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
     """
 }
 
@@ -77,10 +77,10 @@ workflow agrenseq {
 
     matrix = CreatePresenceMatrix(accession_table)
 
-    assembly = Channel
-        .fromPath(params.assembly)
+    reference = Channel
+        .fromPath(params.reference)
 
-    nlrparser = NLRParser(assembly)
+    nlrparser = NLRParser(reference)
 
-    association = RunAssociation(matrix, assembly, phenotype_file, nlrparser)
+    association = RunAssociation(matrix, reference, phenotype_file, nlrparser)
 }
