@@ -1,6 +1,11 @@
 include { agrenseq } from './modules/agrenseq.nf'
 include { drenseq } from './modules/drenseq.nf'
 
+params.workflow = ''
+params.reference = ''
+params.reads = ''
+params.bed = ''
+
 help_message = """
 Needin' some help? ------------------------------------------------------------
 
