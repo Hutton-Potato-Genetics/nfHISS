@@ -1,11 +1,3 @@
-log.info """\
-Hey cowboy, welcome to...
-H I S S
-
-
-
-
-
 process JellyfishCount {
     conda 'jellyfish=2.2.10'
     cpus 2
@@ -221,7 +213,7 @@ workflow {
     if params.workflow == "agrenseq" {
         agrenseq()
     }
-    elif params.workflow == "drenseq {
+    elif params.workflow == "drenseq" {
         drenseq()
     }
 }
