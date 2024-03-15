@@ -209,10 +209,12 @@ workflow drenseq {
     BedtoolsCoverage(bed.first(), bams).collectFile(name: 'coverage.txt')
 }
 
+
+
 workflow {
     switch (params.workflow) {
         case "agrenseq": agrenseq()
         case "drenseq": drenseq()
-        default: fail("Unknown workflow: ${params.workflow}")
+        default: error("Unknown workflow: ${params.workflow}")
     }
 }
