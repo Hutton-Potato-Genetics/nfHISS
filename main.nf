@@ -213,8 +213,11 @@ workflow drenseq {
 
 workflow {
     switch (params.workflow) {
-        case "agrenseq": agrenseq()
-        case "drenseq": drenseq()
-        default: error("Unknown workflow: ${params.workflow}")
+        case "agrenseq":
+            agrenseq()
+        case "drenseq":
+            drenseq()
+        default:
+            error("Unknown workflow: ${params.workflow}")
     }
 }
