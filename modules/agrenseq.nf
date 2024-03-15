@@ -10,7 +10,7 @@ process CountKmers {
     script:
     """
     cat $read1 $read2 > reads.fq.gz
-    kmc -k51 -m8 -t${task.cpus} reads.fq.gz kmc_output
+    kmc -k51 -m8 -t${task.cpus} reads.fq.gz kmc_output .
     kmc_tools transform kmc_output -ci10 dump ${sample}.dump
     """
 }
