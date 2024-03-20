@@ -76,6 +76,7 @@ process SambambaFilter {
 }
 
 process BedtoolsCoverage {
+    publishDir 'coverage', mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bedtools:2.30.0--h468198e_3'
     cpus 1
     memory { 1.GB * task.attempt }
@@ -84,11 +85,10 @@ process BedtoolsCoverage {
     path bed
     tuple val(sample), path(bam)
     output:
-    stdout
+    path '${sample}.coverage.txt'
     script:
     """
-    bedtools coverage -a $bed -b $bam | \
-      awk 'BEGIN {OFS="\\t"} {print "${sample}", \$0}'
+    bedtools coverage -a $bed -b $bam > ${sample}.coverage.txt
     """
 }
 
@@ -97,7 +97,7 @@ workflow drenseq {
         .fromPath(params.reference) \
         | BowtieBuild
 
-    bed = Channel.fromPath(params.bed)
+    bed = file(params.bed)
 
     Channel
         .fromPath(params.reads)
@@ -109,5 +109,5 @@ workflow drenseq {
         | SamtoolsSort \
         | SambambaFilter
 
-    BedtoolsCoverage(bed.first(), bams).collectFile(name: 'coverage.txt')
+    BedtoolsCoverage(bed, bams)
 }

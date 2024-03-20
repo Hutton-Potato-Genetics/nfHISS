@@ -11,14 +11,32 @@ There are currently two workflows available in this pipeline:
 agrenseq ----------------------------------------------------------------------
 
 Usage:
-    nextflow run SwiftSeal/nfHISS --workflow agrenseq \
-                                  --reference <reference> \
-                                  --read_scores <read_scores> \
-                                  <other options>
+  nextflow run SwiftSeal/nfHISS --workflow agrenseq \
+                                --reference <reference> \
+                                --reads <read_scores> \
+                                <other options>
 
 Options:
-    --reference <reference>     Path to the reference fasta
-    --read_scores <read_scores> Path to the read scores file
+  --reference <reference>     Path to the reference fasta
+  --reads <read_scores>       Path to the reads file - tab-separated file
+                              with columns 'sample', 'forward', 'reverse',
+                              and 'score'
+
+drenseq -----------------------------------------------------------------------
+
+Usage:
+  nextflow run SwiftSeal/nfHISS --workflow drenseq \
+                                --reference <reference> \
+                                --bed <bed_file> \
+                                --reads <read_scores> \
+                                <other options>
+
+Options:
+  --reference <reference>     Path to the reference fasta
+  --reads <read_scores>       Path to the reads file - tab-separated file
+  --bed <bed_file>            Path to the bed file - tab-separated file
+                              with columns 'sample', 'forward', and
+                              'reverse'
 """
 
 workflow {
