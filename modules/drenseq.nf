@@ -2,6 +2,7 @@ process BowtieBuild {
     container 'https://depot.galaxyproject.org/singularity/bowtie2:2.5.1--py39h3321a2d_0'
     cpus 1
     memory { 1.GB * task.attempt }
+    maxRetries 3
     time '1h'
     input:
     path reference
@@ -18,6 +19,7 @@ process BowtieAlign {
     container 'https://depot.galaxyproject.org/singularity/bowtie2:2.5.1--py39h3321a2d_0'
     cpus 8
     memory { 1.GB * task.attempt }
+    maxRetries 3
     time '4h'
     input:
     path bowtie2_index
@@ -49,6 +51,7 @@ process SamtoolsSort {
     container 'https://depot.galaxyproject.org/singularity/samtools:1.17--h00cdaf9_0'
     cpus 1
     memory { 1.GB * task.attempt }
+    maxRetries 3
     time '4h'
     input:
     tuple val(sample), path(sam)
@@ -64,6 +67,7 @@ process SambambaFilter {
     container 'https://depot.galaxyproject.org/singularity/sambamba:1.0--h98b6b92_0'
     cpus 1
     memory { 1.GB * task.attempt }
+    maxRetries 3
     time '4h'
     input:
     tuple val(sample), path(bam)
@@ -80,6 +84,7 @@ process BedtoolsCoverage {
     container 'https://depot.galaxyproject.org/singularity/bedtools:2.30.0--h468198e_3'
     cpus 1
     memory { 1.GB * task.attempt }
+    maxRetries 3
     time '1h'
     input:
     path bed
