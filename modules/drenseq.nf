@@ -1,7 +1,7 @@
 process Fastp {
     container 'https://depot.galaxyproject.org/singularity/fastp:0.23.3--h5f740d0_0'
     cpus 1
-    memory { 1.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy 'retry'
     maxRetries 3
     time '4h'
