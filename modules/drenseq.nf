@@ -166,5 +166,5 @@ workflow drenseq {
     bams = BowtieAlign(bowtie2_index.first(), trimmed_reads)
     sorted_bams = SamtoolsSort(bams)
     filtered_bams = SambambaFilter(sorted_bams)
-    BedtoolsCoverage(bed, bams)
+    BedtoolsCoverage(bed, filtered_bams)
 }
