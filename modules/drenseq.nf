@@ -163,7 +163,7 @@ workflow drenseq {
         .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) }
 
     trimmed_reads = Fastp(reads)
-    bams = BowtieAlign(bowtie2_index.first(), reads)
+    bams = BowtieAlign(bowtie2_index.first(), trimmed_reads)
     sorted_bams = SamtoolsSort(bams)
     filtered_bams = SambambaFilter(sorted_bams)
     BedtoolsCoverage(bed, bams)
