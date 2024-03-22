@@ -167,4 +167,5 @@ workflow drenseq {
     sorted_bams = SamtoolsSort(bams)
     filtered_bams = SambambaFilter(sorted_bams)
     BedtoolsCoverage(bed, filtered_bams)
+    FreeBayes(file(params.reference), bed, filtered_bams)
 }
