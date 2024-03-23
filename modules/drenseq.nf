@@ -149,7 +149,7 @@ process MergeVCFs {
     path 'merged.vcf'
     script:
     """
-    VCF_FILES=\$()
+    VCF_FILES=\$(ls *.vcf.gz)
     bcftools merge -o merged.vcf $VCF_FILES
     """
 }
@@ -171,7 +171,8 @@ workflow drenseq {
 
     BedtoolsCoverage(bed, bams)
 
-    FreeBayes(file(params.reference), bed, bams) \
-        | collect \
-        | MergeVCFs
+    vcfs = FreeBayes(file(params.reference), bed, bams) \
+        | collect
+
+    MergeVCFs(vcfs, file(params.reference), bed)
 }
