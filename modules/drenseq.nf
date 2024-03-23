@@ -49,6 +49,7 @@ process BowtieAlign {
     tuple val(sample), path(read1), path(read2)
     output:
     path "${sample}.bam"
+    path "${sample}.bam.bai"
     script:
     """
     bowtie2 \
@@ -73,6 +74,8 @@ process BowtieAlign {
         --filter='[NM] == 0' \
         aligned.bam \
         > ${sample}.bam
+
+    samtools index ${sample}.bam
     """
 }
 
@@ -87,6 +90,7 @@ process BedtoolsCoverage {
     input:
     path bed
     path bam
+    path bai
     output:
     path "${bam.baseName}.coverage.txt"
     script:
@@ -110,6 +114,7 @@ process FreeBayes {
     path reference
     path bed
     path bam
+    path bai
     output:
     tuple path("${bam.baseName}.vcf.gz"), path("${bam.baseName}.vcf.gz.tbi")
     script:
@@ -167,11 +172,11 @@ workflow drenseq {
         .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) } \
         | Fastp
 
-    bams = BowtieAlign(bowtie2_index.first(), reads)
+    (bam, bai) = BowtieAlign(bowtie2_index.first(), reads)
 
-    BedtoolsCoverage(bed, bams)
+    BedtoolsCoverage(bed, bam, bai)
 
-    vcfs = FreeBayes(file(params.reference), bed, bams) \
+    vcfs = FreeBayes(file(params.reference), bed, bam, bai) \
         | collect
 
     MergeVCFs(vcfs, file(params.reference), bed)
