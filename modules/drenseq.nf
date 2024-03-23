@@ -14,7 +14,7 @@ process Fastp {
     tuple val(sample), path('R1.fastq.gz'), path('R2.fastq.gz')
     script:
     """
-    micromamba run fastp -i $read1 -I $read2 -o R1.fastq.gz -O R2.fastq.gz
+    fastp -i $read1 -I $read2 -o R1.fastq.gz -O R2.fastq.gz
     """
 }
 
@@ -33,7 +33,7 @@ process BowtieBuild {
     script:
     """
     mkdir bowtie2_index
-    micromamba run bowtie2-build $reference bowtie2_index/reference
+    bowtie2-build $reference bowtie2_index/reference
     """
 }
 
@@ -53,7 +53,7 @@ process BowtieAlign {
     path "${sample}.bam.bai"
     script:
     """
-    micromamba run bowtie2 \
+    bowtie2 \
       -x ${bowtie2_index}/reference \
       -1 $read1 \
       -2 $read2 \
@@ -70,13 +70,13 @@ process BowtieAlign {
       -k 10 \
       | samtools sort -@ ${task.cpus} -o aligned.bam
     
-    micromamba run sambamba view \
+    sambamba view \
         --format=bam \
         --filter='[NM] == 0' \
         aligned.bam \
         > ${sample}.bam
 
-    micromamba run samtools index ${sample}.bam
+    samtools index ${sample}.bam
     """
 }
 
@@ -96,7 +96,7 @@ process BedtoolsCoverage {
     path "${bam.baseName}.coverage.txt"
     script:
     """
-    micromamba run bedtools coverage \
+    bedtools coverage \
         -a $bed \
         -b $bam \
         > ${bam.baseName}.coverage.txt
@@ -120,7 +120,7 @@ process FreeBayes {
     tuple path("${bam.baseName}.vcf.gz"), path("${bam.baseName}.vcf.gz.tbi")
     script:
     """
-    micromamba run freebayes \
+    freebayes \
       -f ${reference} \
       -t ${bed} \
       --min-alternate-count 2 \
@@ -133,10 +133,10 @@ process FreeBayes {
       -v variants.vcf \
       --legacy-gls ${bam}
 
-    micromamba run bcftools sort -o variants.sorted.vcf variants.vcf
+    bcftools sort -o variants.sorted.vcf variants.vcf
 
-    micromamba run bgzip -c variants.sorted.vcf > ${bam.baseName}.vcf.gz
-    micromamba run tabix -p vcf ${bam.baseName}.vcf.gz
+    bgzip -c variants.sorted.vcf > ${bam.baseName}.vcf.gz
+    tabix -p vcf ${bam.baseName}.vcf.gz
     """
 }
 
@@ -156,7 +156,7 @@ process MergeVCFs {
     script:
     """
     VCF_FILES=\$(ls *.vcf.gz)
-    micromamba run bcftools merge -o merged.vcf $VCF_FILES
+    bcftools merge -o merged.vcf $VCF_FILES
     """
 }
 
