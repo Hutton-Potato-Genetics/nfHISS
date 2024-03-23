@@ -1,6 +1,7 @@
+conda_env = 'bioconda::fastp=0.23.4 bioconda::freebayes=1.3.7 bioconda::sambamba=1.0 bioconda::samtools=1.19.2 bioconda::bcftools=1.19 bioconda::bowtie2=2.5.3 bioconda::htslib=1.19.1 bioconda::bedtools=2.31.1'
 
 process Fastp {
-    container 'swiftseal/drenseq:latest'
+    conda conda_env
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -19,7 +20,7 @@ process Fastp {
 
 
 process BowtieBuild {
-    container 'swiftseal/drenseq:latest'
+    conda conda_env
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -37,7 +38,7 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    container 'swiftseal/drenseq:latest'
+    conda conda_env
     scratch true
     cpus 8
     memory { 4.GB * task.attempt }
@@ -81,7 +82,7 @@ process BowtieAlign {
 
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
-    container 'swiftseal/drenseq:latest'
+    conda conda_env
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -103,7 +104,7 @@ process BedtoolsCoverage {
 }
 
 process FreeBayes {
-    container 'swiftseal/drenseq:latest'
+    conda conda_env
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -140,7 +141,7 @@ process FreeBayes {
 }
 
 process MergeVCFs {
-    container 'swiftseal/drenseq:latest'
+    conda conda_env
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
