@@ -78,7 +78,7 @@ process BowtieAlign {
 
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
-    conda 'bowtie2=2.5.3'
+    conda 'bedtools=2.31.1'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
