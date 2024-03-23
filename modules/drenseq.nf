@@ -1,6 +1,6 @@
 
 process Fastp {
-    container 'swiftseal/drenseq'
+    container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -19,7 +19,7 @@ process Fastp {
 
 
 process BowtieBuild {
-    container 'swiftseal/drenseq'
+    container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -37,7 +37,7 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    container 'swiftseal/drenseq'
+    container 'swiftseal/drenseq:latest'
     scratch true
     cpus 8
     memory { 4.GB * task.attempt }
@@ -81,7 +81,7 @@ process BowtieAlign {
 
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
-    container 'swiftseal/drenseq'
+    container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -103,7 +103,7 @@ process BedtoolsCoverage {
 }
 
 process FreeBayes {
-    container 'swiftseal/drenseq'
+    container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -140,7 +140,7 @@ process FreeBayes {
 }
 
 process MergeVCFs {
-    container 'swiftseal/drenseq'
+    container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
