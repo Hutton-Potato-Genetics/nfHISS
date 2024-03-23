@@ -1,10 +1,10 @@
 
 process Fastp {
-    conda 'fastp=0.23.4'
+    container 'swiftseal/drenseq'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
-    errorStrategy 'retry'
+    errorStrategy {'retry'}
     maxRetries 3
     time '4h'
     input:
@@ -19,7 +19,7 @@ process Fastp {
 
 
 process BowtieBuild {
-    conda 'bowtie2=2.5.3'
+    container 'swiftseal/drenseq'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -37,10 +37,10 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    conda 'bowtie2=2.5.3 samtools=1.19.2 sambamba=1.0'
+    container 'swiftseal/drenseq'
     scratch true
     cpus 8
-    memory { 2.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy 'retry'
     maxRetries 3
     time '4h'
@@ -78,7 +78,7 @@ process BowtieAlign {
 
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
-    conda 'bedtools=2.31.1'
+    container 'swiftseal/drenseq'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -99,7 +99,7 @@ process BedtoolsCoverage {
 }
 
 process FreeBayes {
-    conda 'freebayes=1.3.7 bcftools=1.19 htslib=1.19.1'
+    container 'swiftseal/drenseq'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -111,7 +111,7 @@ process FreeBayes {
     path bed
     path bam
     output:
-    tuple path("${vcf.baseName}.vcf.gz"), path("${vcf.baseName}.vcf.gz.tbi")
+    tuple path("${bam.baseName}.vcf.gz"), path("${bam.baseName}.vcf.gz.tbi")
     script:
     """
     freebayes \
@@ -135,7 +135,7 @@ process FreeBayes {
 }
 
 process MergeVCFs {
-    conda 'bcftools=1.19'
+    container 'swiftseal/drenseq'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
