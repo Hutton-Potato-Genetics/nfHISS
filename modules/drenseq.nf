@@ -1,6 +1,6 @@
 
 process Fastp {
-    conda 'envs/drenseq.yml'
+    conda '${projectDir}/envs/drenseq.yml'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -19,7 +19,7 @@ process Fastp {
 
 
 process BowtieBuild {
-    conda 'envs/drenseq.yml'
+    conda '${projectDir}/envs/drenseq.yml'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -37,7 +37,7 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    conda 'envs/drenseq.yml'
+    conda '${projectDir}/envs/drenseq.yml'
     scratch true
     cpus 8
     memory { 2.GB * task.attempt }
@@ -78,7 +78,7 @@ process BowtieAlign {
 
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
-    conda 'envs/drenseq.yml'
+    conda '${projectDir}/envs/drenseq.yml'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -99,7 +99,7 @@ process BedtoolsCoverage {
 }
 
 process FreeBayes {
-    conda 'envs/drenseq.yml'
+    conda '${projectDir}/envs/drenseq.yml'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
@@ -135,7 +135,7 @@ process FreeBayes {
 }
 
 process MergeVCFs {
-    conda 'envs/drenseq.yml'
+    conda '${projectDir}/envs/drenseq.yml'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
