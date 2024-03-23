@@ -1,5 +1,7 @@
+
 process Fastp {
-    container 'https://depot.galaxyproject.org/singularity/fastp:0.23.3--h5f740d0_0'
+    conda 'envs/drenseq.yml'
+    scratch true
     cpus 1
     memory { 4.GB * task.attempt }
     errorStrategy 'retry'
@@ -17,7 +19,7 @@ process Fastp {
 
 
 process BowtieBuild {
-    container 'https://depot.galaxyproject.org/singularity/bowtie2:2.5.1--py39h3321a2d_0'
+    conda 'envs/drenseq.yml'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -35,9 +37,10 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    container 'https://depot.galaxyproject.org/singularity/bowtie2:2.5.1--py39h3321a2d_0'
+    conda 'envs/drenseq.yml'
+    scratch true
     cpus 8
-    memory { 1.GB * task.attempt }
+    memory { 2.GB * task.attempt }
     errorStrategy 'retry'
     maxRetries 3
     time '4h'
@@ -45,7 +48,7 @@ process BowtieAlign {
     path bowtie2_index
     tuple val(sample), path(read1), path(read2)
     output:
-    tuple val(sample), path('aligned.sam')
+    path "${sample}.bam"
     script:
     """
     bowtie2 \
@@ -63,47 +66,19 @@ process BowtieAlign {
       --no-unal \
       --no-discordant \
       -k 10 \
-      > aligned.sam
-    """
-}
-
-process SamtoolsSort {
-    container 'https://depot.galaxyproject.org/singularity/samtools:1.17--h00cdaf9_0'
-    cpus 1
-    memory { 1.GB * task.attempt }
-    errorStrategy 'retry'
-    maxRetries 3
-    time '4h'
-    input:
-    tuple val(sample), path(sam)
-    output:
-    tuple val(sample), path("aligned.sorted.bam")
-    script:
-    """
-    samtools sort -@ ${task.cpus} -o aligned.sorted.bam ${sam}
-    """
-}
-
-process SambambaFilter {
-    container 'https://depot.galaxyproject.org/singularity/sambamba:1.0--h98b6b92_0'
-    cpus 1
-    memory { 1.GB * task.attempt }
-    errorStrategy 'retry'
-    maxRetries 3
-    time '4h'
-    input:
-    tuple val(sample), path(bam)
-    output:
-    tuple val(sample), path('aligned.filtered.bam')
-    script:
-    """
-    sambamba view --format=bam --filter='[NM] == 0' ${bam} > aligned.filtered.bam
+      | samtools sort -@ ${task.cpus} -o aligned.bam
+    
+    sambamba view \
+        --format=bam \
+        --filter='[NM] == 0' \
+        aligned.bam \
+        > ${sample}.bam
     """
 }
 
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
-    container 'https://depot.galaxyproject.org/singularity/bedtools:2.30.0--h468198e_3'
+    conda 'envs/drenseq.yml'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy 'retry'
@@ -111,17 +86,21 @@ process BedtoolsCoverage {
     time '1h'
     input:
     path bed
-    tuple val(sample), path(bam)
+    path bam
     output:
-    path '${sample}.coverage.txt'
+    path "${bam.baseName}.coverage.txt"
     script:
     """
-    bedtools coverage -a $bed -b $bam > ${sample}.coverage.txt
+    bedtools coverage \
+        -a $bed \
+        -b $bam \
+        > ${bam.baseName}.coverage.txt
     """
 }
 
 process FreeBayes {
-    container 'https://depot.galaxyproject.org/singularity/freebayes:1.3.7--h1870644_0'
+    conda 'envs/drenseq.yml'
+    scratch true
     cpus 1
     memory { 4.GB * task.attempt }
     errorStrategy 'retry'
@@ -130,9 +109,9 @@ process FreeBayes {
     input:
     path reference
     path bed
-    tuple val(sample), path(bam)
+    path bam
     output:
-    tuple val(sample), path('variants.vcf')
+    tuple path("${vcf.baseName}.vcf.gz"), path("${vcf.baseName}.vcf.gz.tbi")
     script:
     """
     freebayes \
@@ -147,6 +126,31 @@ process FreeBayes {
       -m 0 \
       -v variants.vcf \
       --legacy-gls ${bam}
+
+    bcftools sort -o variants.sorted.vcf variants.vcf
+
+    bgzip -c variants.sorted.vcf > ${bam.baseName}.vcf.gz
+    tabix -p vcf ${bam.baseName}.vcf.gz
+    """
+}
+
+process MergeVCFs {
+    conda 'envs/drenseq.yml'
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy 'retry'
+    maxRetries 3
+    time '1h'
+    input:
+    path vcf_files
+    path reference
+    path bed
+    output:
+    path 'merged.vcf'
+    script:
+    """
+    VCF_FILES=\$()
+    bcftools merge -o merged.vcf $VCF_FILES
     """
 }
 
@@ -160,12 +164,14 @@ workflow drenseq {
     reads = Channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
-        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) }
+        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) } \
+        | Fastp
 
-    trimmed_reads = Fastp(reads)
-    bams = BowtieAlign(bowtie2_index.first(), trimmed_reads)
-    sorted_bams = SamtoolsSort(bams)
-    filtered_bams = SambambaFilter(sorted_bams)
-    BedtoolsCoverage(bed, filtered_bams)
-    FreeBayes(file(params.reference), bed, filtered_bams)
+    bams = BowtieAlign(bowtie2_index.first(), reads)
+
+    BedtoolsCoverage(bed, bams)
+
+    FreeBayes(file(params.reference), bed, bams) \
+        | collect \
+        | MergeVCFs
 }
