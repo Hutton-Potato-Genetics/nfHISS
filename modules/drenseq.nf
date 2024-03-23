@@ -2,10 +2,11 @@ conda_env = 'bioconda::fastp=0.23.4 bioconda::freebayes=1.3.7 bioconda::sambamba
 
 process Fastp {
     conda conda_env
+    container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
-    errorStrategy {'retry'}
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
@@ -21,9 +22,10 @@ process Fastp {
 
 process BowtieBuild {
     conda conda_env
+    container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy 'retry'
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -39,10 +41,11 @@ process BowtieBuild {
 
 process BowtieAlign {
     conda conda_env
+    container 'swiftseal/drenseq:latest'
     scratch true
     cpus 8
     memory { 4.GB * task.attempt }
-    errorStrategy 'retry'
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
@@ -83,9 +86,10 @@ process BowtieAlign {
 process BedtoolsCoverage {
     publishDir 'coverage', mode: 'copy'
     conda conda_env
+    container 'swiftseal/drenseq:latest'
     cpus 1
-    memory { 1.GB * task.attempt }
-    errorStrategy 'retry'
+    memory { 2.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -105,10 +109,11 @@ process BedtoolsCoverage {
 
 process FreeBayes {
     conda conda_env
+    container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
-    errorStrategy 'retry'
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
@@ -142,9 +147,10 @@ process FreeBayes {
 
 process MergeVCFs {
     conda conda_env
+    container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy 'retry'
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -156,7 +162,7 @@ process MergeVCFs {
     script:
     """
     VCF_FILES=\$(ls *.vcf.gz)
-    bcftools merge -o merged.vcf $VCF_FILES
+    bcftools merge -o merged.vcf \$VCF_FILES
     """
 }
 
