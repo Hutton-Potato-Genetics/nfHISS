@@ -19,6 +19,23 @@ process Fastp {
     """
 }
 
+process SamtoolsFaidx {
+    conda conda_env
+    container 'swiftseal/drenseq:latest'
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path reference
+    output:
+    path "${reference}.fai"
+    script:
+    """
+    samtools faidx $reference
+    """
+}
 
 process BowtieBuild {
     conda conda_env
@@ -44,7 +61,7 @@ process BowtieAlign {
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 8
-    memory { 4.GB * task.attempt }
+    memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
@@ -112,12 +129,13 @@ process FreeBayes {
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
-    memory { 4.GB * task.attempt }
+    memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
     path reference
+    path fai
     path bed
     path bam
     path bai
@@ -173,6 +191,8 @@ workflow drenseq {
 
     bed = file(params.bed)
 
+    fai = SamtoolsFaidx(file(params.reference))
+
     reads = Channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
@@ -183,7 +203,7 @@ workflow drenseq {
 
     BedtoolsCoverage(bed, bam, bai)
 
-    vcfs = FreeBayes(file(params.reference), bed, bam, bai) \
+    vcfs = FreeBayes(file(params.reference), fai, bed, bam, bai) \
         | collect
 
     MergeVCFs(vcfs, file(params.reference), bed)
