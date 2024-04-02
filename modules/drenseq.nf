@@ -174,7 +174,7 @@ process FreeBayes {
     scratch true
     cpus 1
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy 'retry'
     maxRetries 3
     time '4h'
     input:
