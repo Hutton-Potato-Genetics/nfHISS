@@ -21,7 +21,19 @@ process Canu {
 }
 
 process SeqkitStats {
-  container
+  container 'docker://swiftseal/smrtrenseq:latest'
+  cpus 1
+  memory '1 GB'
+  maxRetries 3
+  time '1h'
+  input:
+  path reads
+  output:
+  path "${reads}.stats"
+  script:
+  """
+  seqkit stats $reads > ${reads}.stats
+  """
 }
 
 workflow smrtrenseq {
