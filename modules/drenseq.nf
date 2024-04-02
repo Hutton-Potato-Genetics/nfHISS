@@ -9,6 +9,21 @@ bioconda::htslib=1.19.1
 bioconda::bedtools=2.31.1
 """
 
+// Trim the bed file to an expected size
+process TrimBed {
+    cpus 1
+    memory '1 GB'
+    time '1h'
+    input:
+    path bed
+    output:
+    path 'trimmed.bed'
+    script:
+    """
+    awk '{print $1"\t"$2"\t"$3"\t"$4}' $bed > trimmed.bed
+    """
+}
+
 process Fastp {
     conda conda_env
     container 'swiftseal/drenseq:latest'
@@ -241,7 +256,7 @@ process CoverageMatrix{
         read.table(x) %>% mutate(sample = gsub(EXTENSION, "", basename(x)))
       }) %>%
       bind_rows() %>%
-      select(gene = V4, sample = sample, coverage = V10)
+      select(gene = V4, sample = sample, coverage = V8)
 
     matrix <- merged %>%
       pivot_wider(names_from = sample, values_from = coverage)
@@ -256,7 +271,8 @@ workflow drenseq {
         .fromPath(params.reference) \
         | BowtieBuild
 
-    bed = file(params.bed)
+    bed = file(params.bed) \
+        | TrimBed
 
     fai = SamtoolsFaidx(file(params.reference))
 
