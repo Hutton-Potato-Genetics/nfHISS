@@ -271,8 +271,7 @@ workflow drenseq {
         .fromPath(params.reference) \
         | BowtieBuild
 
-    bed = file(params.bed) \
-        | TrimBed
+    bed = TrimBed(file(params.bed))
 
     fai = SamtoolsFaidx(file(params.reference))
 
