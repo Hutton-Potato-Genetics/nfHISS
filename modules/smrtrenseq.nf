@@ -1,5 +1,5 @@
 process Canu {
-  container 'https://depot.galaxyproject.org/singularity/canu:2.2--ha47f30e_0'
+  container 'docker://swiftseal/smrtrenseq:latest'
   cpus 8
   memory { 16.GB * task.attempt }
   maxRetries 3

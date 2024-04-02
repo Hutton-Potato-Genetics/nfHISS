@@ -1,4 +1,13 @@
-conda_env = 'bioconda::fastp=0.23.4 bioconda::freebayes=1.3.7 bioconda::sambamba=1.0 bioconda::samtools=1.19.2 bioconda::bcftools=1.19 bioconda::bowtie2=2.5.3 bioconda::htslib=1.19.1 bioconda::bedtools=2.31.1'
+conda_env = """
+bioconda::fastp=0.23.4
+bioconda::freebayes=1.3.7
+bioconda::sambamba=1.0
+bioconda::samtools=1.19.2
+bioconda::bcftools=1.19
+bioconda::bowtie2=2.5.3
+bioconda::htslib=1.19.1
+bioconda::bedtools=2.31.1
+"""
 
 process Fastp {
     conda conda_env
@@ -64,7 +73,7 @@ process BowtieAlign {
     memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '6h'
     input:
     path bowtie2_index
     tuple val(sample), path(read1), path(read2)
@@ -88,24 +97,44 @@ process BowtieAlign {
       --no-unal \
       --no-discordant \
       -k 10 \
-      | samtools sort -@ ${task.cpus} -o aligned.bam
-    
-    sambamba view \
-        --format=bam \
-        --filter='[NM] == 0' \
-        aligned.bam \
-        > ${sample}.bam
+      | samtools sort -@ ${task.cpus} -o ${sample}.bam
 
     samtools index ${sample}.bam
     """
 }
 
+process StrictFilter {
+    conda conda_env
+    container 'swiftseal/drenseq:latest'
+    scratch true
+    cpus 1
+    memory { 8.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '2h'
+    input:
+    path bam
+    path bai
+    output:
+    path "${sample}.strict.bam"
+    path "${sample}.strict.bam.bai"
+    script:
+    """    
+    sambamba view \
+        --format=bam \
+        --filter='[NM] == 0' \
+        $bam \
+        > ${sample}.strict.bam
+
+    samtools index ${sample}.strict.bam
+    """   
+}
+
 process BedtoolsCoverage {
-    publishDir 'coverage', mode: 'copy'
     conda conda_env
     container 'swiftseal/drenseq:latest'
     cpus 1
-    memory { 2.GB * task.attempt }
+    memory { 16.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
@@ -167,7 +196,7 @@ process MergeVCFs {
     conda conda_env
     container 'swiftseal/drenseq:latest'
     cpus 1
-    memory { 1.GB * task.attempt }
+    memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
@@ -181,6 +210,44 @@ process MergeVCFs {
     """
     VCF_FILES=\$(ls *.vcf.gz)
     bcftools merge -o merged.vcf \$VCF_FILES
+    """
+}
+
+process CoverageMatrix{
+    container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path txt
+    output:
+    path 'merged.csv'
+    script:
+    """
+    #!/usr/bin/env Rscript
+    # Could use data.table, but I'm lazy :-)
+    library(tidyverse)
+
+    EXTENSION <- ".coverage.txt"
+
+    # list all files in directory
+    files <- list.files(path = "coverage", pattern = EXTENSION, full.names = TRUE)
+
+    # read all files into a list, appending the sample name
+    merged <- files %>%
+      map(function(x) {
+        read.table(x) %>% mutate(sample = gsub(EXTENSION, "", basename(x)))
+      }) %>%
+      bind_rows() %>%
+      select(gene = V4, sample = sample, coverage = V10)
+
+    matrix <- merged %>%
+      pivot_wider(names_from = sample, values_from = coverage)
+
+    write_delim(merged, "coverage_long.tsv", delim = "\t", col_names = FALSE)
+    write_delim(matrix, "coverage_matrix.tsv", delim = "\t", col_names = TRUE)
     """
 }
 
@@ -201,7 +268,9 @@ workflow drenseq {
 
     (bam, bai) = BowtieAlign(bowtie2_index.first(), reads)
 
-    BedtoolsCoverage(bed, bam, bai)
+    (strict_bam, strict_bai) = StrictFilter(bam, bai)
+
+    BedtoolsCoverage(bed, strict_bam, strict_bai)
 
     vcfs = FreeBayes(file(params.reference), fai, bed, bam, bai) \
         | collect
