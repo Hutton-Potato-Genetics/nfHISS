@@ -139,9 +139,9 @@ process StrictFilter {
         --format=bam \
         --filter='[NM] == 0' \
         $bam \
-        > ${sample}.strict.bam
+        > ${bam.baseName}.strict.bam
 
-    samtools index ${sample}.strict.bam
+    samtools index ${bam.baseName}.strict.bam
     """   
 }
 
