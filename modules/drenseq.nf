@@ -20,7 +20,7 @@ process TrimBed {
     path 'trimmed.bed'
     script:
     """
-    awk '{print $1"\t"$2"\t"$3"\t"$4}' $bed > trimmed.bed
+    awk '{print \$1"\t"\$2"\t"\$3"\t"\$4}' $bed > trimmed.bed
     """
 }
 
