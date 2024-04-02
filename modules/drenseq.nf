@@ -131,8 +131,8 @@ process StrictFilter {
     path bam
     path bai
     output:
-    path "${sample}.strict.bam"
-    path "${sample}.strict.bam.bai"
+    path "${bam.baseName}.strict.bam"
+    path "${bam.baseName}.strict.bam.bai"
     script:
     """    
     sambamba view \
