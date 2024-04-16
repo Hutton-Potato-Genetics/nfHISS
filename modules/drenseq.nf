@@ -123,7 +123,7 @@ process StrictFilter {
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
-    memory { 8.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
@@ -173,8 +173,8 @@ process FreeBayes {
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
-    memory { 8.GB * task.attempt }
-    errorStrategy 'retry'
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
@@ -192,10 +192,7 @@ process FreeBayes {
       -t ${bed} \
       --min-alternate-count 2 \
       --min-alternate-fraction 0.05 \
-      --ploidy 2 \
-      --throw-away-indel-obs \
-      --throw-away-mnps-obs \
-      --throw-away-complex-obs \
+      --ploidy 4 \
       -m 0 \
       -v variants.vcf \
       --legacy-gls ${bam}
