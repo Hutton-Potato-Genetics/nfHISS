@@ -1,13 +1,13 @@
-conda_env = """
-bioconda::fastp=0.23.4
-bioconda::freebayes=1.3.7
-bioconda::sambamba=1.0
-bioconda::samtools=1.19.2
-bioconda::bcftools=1.19
-bioconda::bowtie2=2.5.3
-bioconda::htslib=1.19.1
-bioconda::bedtools=2.31.1
-"""
+//conda_env = """
+//bioconda::fastp=0.23.4
+//bioconda::freebayes=1.3.7
+//bioconda::sambamba=1.0
+//bioconda::samtools=1.19.2
+//bioconda::bcftools=1.19
+//bioconda::bowtie2=2.5.3
+//bioconda::htslib=1.19.1
+//bioconda::bedtools=2.31.1
+//"""
 
 // Trim the bed file to an expected size
 process TrimBed {
@@ -25,7 +25,7 @@ process TrimBed {
 }
 
 process Fastp {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
@@ -44,7 +44,7 @@ process Fastp {
 }
 
 process SamtoolsFaidx {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
@@ -62,7 +62,7 @@ process SamtoolsFaidx {
 }
 
 process BowtieBuild {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 1.GB * task.attempt }
@@ -81,7 +81,7 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 8
@@ -119,7 +119,7 @@ process BowtieAlign {
 }
 
 process StrictFilter {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
@@ -146,7 +146,7 @@ process StrictFilter {
 }
 
 process BedtoolsCoverage {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 16.GB * task.attempt }
@@ -169,7 +169,7 @@ process BedtoolsCoverage {
 }
 
 process FreeBayes {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     scratch true
     cpus 1
@@ -205,7 +205,7 @@ process FreeBayes {
 }
 
 process MergeVCFs {
-    conda conda_env
+    //conda conda_env
     container 'swiftseal/drenseq:latest'
     cpus 1
     memory { 8.GB * task.attempt }
@@ -226,7 +226,7 @@ process MergeVCFs {
 }
 
 process CoverageMatrix{
-    container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
+    //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
