@@ -23,6 +23,7 @@ process CanuAssemble {
     scratch true
     cpus 8
     memory { 36.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '48h'
     input:
@@ -44,6 +45,7 @@ process SeqkitStats {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -63,12 +65,13 @@ process ChopSequences {
     scratch true
     cpus 1
     memory { 2.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
     path assembly
     output:
-    path "chopped.fa"
+    path 'chopped.fa'
     script:
     """
     chop_sequences.sh -i $assembly -o chopped.fa
@@ -80,12 +83,13 @@ process NLRParser {
     scratch true
     cpus 2
     memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '8h'
     input:
     path chopped
     output:
-    path "parser.xml"
+    path 'parser.xml'
     script:
     """
     nlr_parser.sh -t 2 -i $chopped -o parser.xml
@@ -97,6 +101,7 @@ process NLRAnnotator {
     scratch true
     cpus 1
     memory { 2.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
@@ -118,6 +123,7 @@ process SummariseNLRs {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
@@ -136,6 +142,7 @@ process InputStatistics {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
@@ -154,12 +161,13 @@ process NLR2Bed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
     path annotator_text
     output:
-    path "NLR_Annotator.bed"
+    path 'NLR_Annotator.bed'
     script:
     """
     nlr2bed.py --input $annotator_text --output ${sample}_NLR_Annotator.bed
@@ -170,6 +178,7 @@ process SortNLRBed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -189,13 +198,14 @@ process MapHiFi {
     scratch true
     cpus 8
     memory { 8.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '12h'
     input:
     path trimmed_reads
     path assembly
     output:
-    path "aligned.sam"
+    path 'aligned.sam'
     script:
     """
     minimap2 -x map-hifi -t 8 -a -o aligned.sam $assembly $trimmed_reads
