@@ -11,7 +11,7 @@ process TrimReads {
     val five_prime
     val three_prime
     output:
-    path "${sample}_trimmed.fastq.gz"
+    tuple val(sample), path("${sample}_trimmed.fastq.gz")
     script
     """
     cutadapt -j 8 -g ^$five_prime -a $three_prime\$ -o ${sample}_trimmed.fastq.gz $reads
@@ -202,13 +202,13 @@ process MapHiFi {
     maxRetries 3
     time '12h'
     input:
-    path trimmed_reads
+    tuple val(sample), path(reads)
     path assembly
     output:
     path 'aligned.sam'
     script:
     """
-    minimap2 -x map-hifi -t 8 -a -o aligned.sam $assembly $trimmed_reads
+    minimap2 -x map-hifi -t 8 -a -o aligned.sam $assembly $reads
     """
 }
 
@@ -273,6 +273,31 @@ process ParseCoverage {
 }
 
 workflow smrtrenseq {
-    trimmed_reads = Cutadapt(reads)
-    assembly = Canu(trimmed_reads)
+    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) } | TrimReads
+
+    (assembly, report) = CanuAssemble(reads, params.genome_size, params.max_input_coverage)
+
+    stats = SeqkitStats(assembly, reads)
+
+    chopped = ChopSequences(assembly)
+
+    parser_xml = NLRParser(chopped)
+
+    (annotator_text, annotator_fa) = NLRAnnotator(assembly, parser_xml, params.flanking)
+
+    nlr_summary = SummariseNLRs(annotator_text, reads)
+
+    input_stats = InputStatistics(report, reads)
+
+    nlr_bed = NLR2Bed(annotator_text)
+
+    sorted_bed = SortNLRBed(nlr_bed, reads)
+
+    sam = MapHiFi(reads, assembly)
+
+    (bam, bai) = ParseAlignment(sam)
+
+    coverage = CalculateCoverage(bam, bed, bai)
+
+    parsed_coverage = ParseCoverage(coverage, reads)
 }
