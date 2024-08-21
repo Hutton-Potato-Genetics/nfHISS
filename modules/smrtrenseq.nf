@@ -20,6 +20,7 @@ process TrimReads {
 
 process CanuAssemble {
     container 'docker://quay.io/biocontainers/canu:2.2--ha47f30e_0'
+    scratch true
     cpus 8
     memory { 36.GB * task.attempt }
     maxRetries 3
@@ -40,6 +41,7 @@ process CanuAssemble {
 
 process SeqkitStats {
     container 'docker://quay.io/biocontainers/seqfu:1.20.3--h1eb128b_2'
+    scratch true
     cpus 1
     memory { 1.GB * task.attempt }
     maxRetries 3
@@ -58,6 +60,7 @@ process SeqkitStats {
 
 process chop_sequences {
     container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    scratch true
     cpus 1
     memory { 2.GB * task.attempt }
     maxRetries 3
