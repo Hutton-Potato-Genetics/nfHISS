@@ -253,6 +253,25 @@ process CalculateCoverage {
     """
 }
 
+process ParseCoverage {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '2h'
+    input:
+    path coverage_text
+    tuple val(sample), path(reads)
+    output:
+    path "${sample}_coverage_parsed.txt"
+    publishDir "results/${sample}", mode: 'copy'
+    script:
+    """
+    parse_coverage.py --input $coverage_text --output ${sample}_coverage_parsed.txt
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
