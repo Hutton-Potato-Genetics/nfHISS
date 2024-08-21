@@ -75,6 +75,23 @@ process chop_sequences {
     """
 }
 
+process nlr_parser {
+    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    scratch true
+    cpus 2
+    memory { 4.GB * task.attempt }
+    maxRetries 3
+    time '8h'
+    input:
+    path chopped
+    output:
+    path "parser.xml"
+    script:
+    """
+    nlr_parser.sh -t 2 -i $chopped -o parser.xml
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
