@@ -158,13 +158,29 @@ process NLR2Bed {
     time '2h'
     input:
     path annotator_text
-    tuple val(sample), path(reads)
     output:
-    path "${sample}_NLR_Annotator.bed"
-    publishDir "results/${sample}", mode: 'copy'
+    path "NLR_Annotator.bed"
     script:
     """
     nlr2bed.py --input $annotator_text --output ${sample}_NLR_Annotator.bed
+    """
+}
+
+process SortNLRBed {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    maxRetries 3
+    time '1h'
+    input:
+    path annotator_bed
+    tuple val(sample), path(reads)
+    output:
+    path "${sample}_NLR_Annotator_sorted.bed"
+    publishDir "results/${sample}", mode: 'copy'
+    script:
+    """
+    sort -k1,1V -k2,2n -k3,3n $annotator_bed > ${sample}_NLR_Annotator_sorted.bed
     """
 }
 
