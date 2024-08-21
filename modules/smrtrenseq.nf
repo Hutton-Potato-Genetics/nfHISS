@@ -150,6 +150,24 @@ process InputStatistics {
     """
 }
 
+process NLR2Bed {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    maxRetries 3
+    time '2h'
+    input:
+    path annotator_text
+    tuple val(sample), path(reads)
+    output:
+    path "${sample}_NLR_Annotator.bed"
+    publishDir "results/${sample}", mode: 'copy'
+    script:
+    """
+    nlr2bed.py --input $annotator_text --output ${sample}_NLR_Annotator.bed
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
