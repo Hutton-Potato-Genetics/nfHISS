@@ -202,6 +202,27 @@ process MapHiFi {
     """
 }
 
+process ParseAlignment {
+    container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
+    scratch true
+    cpus 2
+    memory { 2.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '4h'
+    input:
+    path sam
+    output:
+    path 'aligned.bam'
+    path 'aligned.bam.bai'
+    script:
+    """
+    samtools view -F 256 $sam -b -o convert.bam -@ 2
+    samtools sort convert.bam -@ 2 > aligned.bam
+    samtools index aligned.bam -@ 2
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
