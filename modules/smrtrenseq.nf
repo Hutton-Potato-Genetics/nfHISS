@@ -18,25 +18,23 @@ process TrimReads {
     """
 }
 
-process Canu {
-    container 'docker://swiftseal/smrtrenseq:latest'
+process CanuAssemble {
+    container 'docker://quay.io/biocontainers/canu:2.2--ha47f30e_0'
     cpus 8
-    memory { 16.GB * task.attempt }
+    memory { 36.GB * task.attempt }
     maxRetries 3
-    time '24h'
+    time '32h'
     input:
     tuple val(sample), path(reads)
+    val genome_size
+    val max_input_coverage
     output:
-    tuple val(sample), path("assembly/assembly.contigs.fasta")
+    path "assembly/${sample}_assembly.contigs.fasta"
+    path "assembly/${sample}.report"
+    publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    canu \
-        -d assembly \
-        -p assembly \
-        genomeSize=70m
-        useGrid=false \
-        -pacbio-hifi $reads \
-        maxInputCoverage=20000
+    canu -d assembly -p assembly genomeSize=$genome_size useGrid=false -pacbio-hifi $reads maxInputCoverage=$max_input_coverage batMemory=32g
     """
 }
 
