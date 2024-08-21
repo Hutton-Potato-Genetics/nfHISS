@@ -184,6 +184,24 @@ process SortNLRBed {
     """
 }
 
+process MapHiFi {
+    container 'https://depot.galaxyproject.org/singularity/minimap2:2.28--he4a0461_0'
+    scratch true
+    cpus 8
+    memory { 8.GB * task.attempt }
+    maxRetries 3
+    time '12h'
+    input:
+    path trimmed_reads
+    path assembly
+    output:
+    path "aligned.sam"
+    script:
+    """
+    minimap2 -x map-hifi -t 8 -a -o aligned.sam $assembly $trimmed_reads
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
