@@ -233,6 +233,26 @@ process ParseAlignment {
     """
 }
 
+process CalculateCoverage {
+    container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
+    scratch true
+    cpus 1
+    memory { 2.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '2h'
+    input:
+    path bam
+    path nlr_bed
+    path index
+    output:
+    path 'nlr_coverage.txt'
+    script:
+    """
+    samtools bedcov $nlr_bed $bam > nlr_coverage.txt
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
