@@ -92,6 +92,28 @@ process NLRParser {
     """
 }
 
+process NLRAnnotator {
+    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    scratch true
+    cpus 1
+    memory { 2.GB * task.attempt }
+    maxRetries 3
+    time '4h'
+    input:
+    path assembly
+    path parser_xml
+    tuple val(sample), path(reads)
+    val flanking
+    output:
+    path "${sample}_NLR_annotator.txt"
+    path "${sample}_NLR_annotator.fa"
+    publishDir "results/${sample}", mode: 'copy'
+    script:
+    """
+    nlr_annotator.sh -i $parser_xml -o ${sample}_NLR_annotator.txt -f $assembly ${sample}_NLR_annotator.fa $flanking
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
