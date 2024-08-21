@@ -132,6 +132,24 @@ process SummariseNLRs {
     """
 }
 
+process InputStatistics {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    maxRetries 3
+    time '2h'
+    input:
+    path report
+    tuple val(sample), path(reads)
+    output:
+    path "${sample}_input_stats.txt"
+    publishDir "results/${sample}", mode: 'copy'
+    script:
+    """
+    input_stats.sh $report ${sample}_input_stats.txt
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
