@@ -114,6 +114,24 @@ process NLRAnnotator {
     """
 }
 
+process SummariseNLRs {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    maxRetries 3
+    time '2h'
+    input:
+    path annotator_text
+    tuple val(sample), path(reads)
+    output:
+    path "${sample}_NLR_summary.txt"
+    publishDir "results/${sample}", mode: 'copy'
+    script:
+    """
+    summarise_nlrs.py --input $annotator_text --output ${sample}_NLR_summary.txt
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
