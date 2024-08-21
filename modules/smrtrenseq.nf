@@ -56,6 +56,22 @@ process SeqkitStats {
     """
 }
 
+process chop_sequences {
+    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    cpus 1
+    memory { 2.GB * task.attempt }
+    maxRetries 3
+    time '2h'
+    input:
+    path assembly
+    output:
+    path "chopped.fa"
+    script:
+    """
+    chop_sequences.sh -i $assembly -o chopped.fa
+    """
+}
+
 workflow smrtrenseq {
     trimmed_reads = Cutadapt(reads)
     assembly = Canu(trimmed_reads)
