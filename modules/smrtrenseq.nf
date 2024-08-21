@@ -23,7 +23,7 @@ process CanuAssemble {
     cpus 8
     memory { 36.GB * task.attempt }
     maxRetries 3
-    time '32h'
+    time '48h'
     input:
     tuple val(sample), path(reads)
     val genome_size
@@ -39,18 +39,20 @@ process CanuAssemble {
 }
 
 process SeqkitStats {
-    container 'docker://swiftseal/smrtrenseq:latest'
+    container 'docker://quay.io/biocontainers/seqfu:1.20.3--h1eb128b_2'
     cpus 1
-    memory '1 GB'
+    memory { 1.GB * task.attempt }
     maxRetries 3
     time '1h'
     input:
-    path reads
+    path assembly
+    tuple val(sample), path(reads)
     output:
-    path "${reads}.stats"
+    path "${sample}_statistics.txt"
+    publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    seqkit stats $reads > ${reads}.stats
+    seqkit stats -b $assembly | sed 's/_assembly\.contigs//g' > ${sample}_statistics.txt
     """
 }
 
