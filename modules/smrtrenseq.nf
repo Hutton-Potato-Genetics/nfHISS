@@ -58,7 +58,7 @@ process SeqkitStats {
     """
 }
 
-process chop_sequences {
+process ChopSequences {
     container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
     scratch true
     cpus 1
@@ -75,7 +75,7 @@ process chop_sequences {
     """
 }
 
-process nlr_parser {
+process NLRParser {
     container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
     scratch true
     cpus 2
