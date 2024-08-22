@@ -217,7 +217,7 @@ process InputStatistics {
 }
 
 process NLR2Bed {
-    container 'docker://quay.io/biocontainers/python:3.9--1'
+    container 'docker://quay.io/biocontainers/python:3.12'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
@@ -322,7 +322,7 @@ process CalculateCoverage {
 }
 
 process ParseCoverage {
-    container 'docker://quay.io/biocontainers/python:3.9--1'
+    container 'docker://quay.io/biocontainers/python:3.12'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
