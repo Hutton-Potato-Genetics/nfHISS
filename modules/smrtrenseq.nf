@@ -14,7 +14,12 @@ process TrimReads {
     tuple val(sample), path("${sample}_trimmed.fastq.gz")
     script
     """
-    cutadapt -j 8 -g ^$five_prime -a $three_prime\$ -o ${sample}_trimmed.fastq.gz $reads
+    cutadapt \
+      -j 8 \
+      -g ^$five_prime \
+      -a $three_prime\$ \
+      -o ${sample}_trimmed.fastq.gz \
+      $reads
     """
 }
 
@@ -36,7 +41,14 @@ process CanuAssemble {
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    canu -d assembly -p assembly genomeSize=$genome_size useGrid=false -pacbio-hifi $reads maxInputCoverage=$max_input_coverage batMemory=32g
+    canu \
+      -d assembly \
+      -p assembly \
+      genomeSize=$genome_size \
+      useGrid=false \
+      -pacbio-hifi $reads \
+      maxInputCoverage=$max_input_coverage \
+      batMemory=32g
     """
 }
 
@@ -120,6 +132,7 @@ process NLRAnnotator {
 }
 
 process SummariseNLRs {
+    container 'docker://quay.io/biocontainers/python:3.9--1'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
@@ -133,9 +146,52 @@ process SummariseNLRs {
     path "${sample}_NLR_summary.txt"
     publishDir "results/${sample}", mode: 'copy'
     script:
-    """
-    summarise_nlrs.py --input $annotator_text --output ${sample}_NLR_summary.txt
-    """
+   """
+    #!/usr/bin/env python3
+    import csv
+
+    contigs = set()
+    count, pseudogenes, genes, complete, complete_pseudogenes = 0, 0, 0, 0, 0
+
+    with open('$annotator_text') as infile:
+        infile_reader = csv.reader(infile, delimiter='\t')
+        for row in infile_reader:
+            count += 1
+            contigs.add(row[0])
+            nlr_type = row[2]
+            if nlr_type == "complete (psuedogene)" or nlr_type == "partial (pseudogene)":
+                pseudogenes += 1
+            if nlr_type == "complete" or nlr_type == "partial":
+                genes += 1
+            if nlr_type == "complete":
+                complete += 1
+            if nlr_type == "complete (psuedogene)":
+                complete_pseudogenes += 1
+
+    with open('${sample}_NLR_summary.txt', 'w') as outfile:
+        outfile_writer = csv.writer(outfile, delimiter='\t')
+        outfile_writer.writerow(
+            [
+                "NLR Contigs",
+                "NLR Count",
+                "Pseudogenous NLRs",
+                "NLR Genes",
+                "Complete NLRs",
+                "Complete Pseudogenous NLRs",
+            ]
+        )
+
+        outfile_writer.writerow(
+            [
+                len(contigs),
+                count,
+                pseudogenes,
+                genes,
+                complete,
+                complete_pseudogenes,
+            ]
+        )
+    """ 
 }
 
 process InputStatistics {
@@ -154,10 +210,15 @@ process InputStatistics {
     script:
     """
     input_stats.sh $report ${sample}_input_stats.txt
+    Reads=$(cat $report | grep -m 1 'reads' | cut -f5 -d ' ')
+    Bases=$(cat $report | grep -m 1 'bases' | cut -f5 -d ' ')
+    printf "Reads\tBases\n" > ${sample}_input_stats.txt
+    printf "\$Reads\t\$Bases" >> ${sample}_input_stats.txt
     """
 }
 
 process NLR2Bed {
+    container 'docker://quay.io/biocontainers/python:3.9--1'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
@@ -170,7 +231,15 @@ process NLR2Bed {
     path 'NLR_Annotator.bed'
     script:
     """
-    nlr2bed.py --input $annotator_text --output ${sample}_NLR_Annotator.bed
+    #!/usr/bin/env python3
+    import csv
+
+    with open('$annotator_text') as infile, open('NLR_Annotator.bed', 'w') as outfile:
+        infile_reader = csv.reader(infile, delimiter='\t')
+        outfile_writer = csv.writer(outfile, delimiter='\t')
+
+        for row in infile_reader:
+            outfile_writer.writerow([row[0], row[3], row[4], row[1], 0, row[5]])
     """
 }
 
@@ -208,7 +277,7 @@ process MapHiFi {
     path 'aligned.sam'
     script:
     """
-    minimap2 -x map-hifi -t 8 -a -o aligned.sam $assembly $reads
+    minimap2 -x map-hifi -t $task.cpus -a -o aligned.sam $assembly $reads
     """
 }
 
@@ -227,9 +296,9 @@ process ParseAlignment {
     path 'aligned.bam.bai'
     script:
     """
-    samtools view -F 256 $sam -b -o convert.bam -@ 2
-    samtools sort convert.bam -@ 2 > aligned.bam
-    samtools index aligned.bam -@ 2
+    samtools view -F 256 $sam -b -o convert.bam -@ $task.cpus
+    samtools sort convert.bam -@ $task.cpus > aligned.bam
+    samtools index aligned.bam -@ $task.cpus
     """
 }
 
@@ -254,6 +323,7 @@ process CalculateCoverage {
 }
 
 process ParseCoverage {
+    container 'docker://quay.io/biocontainers/python:3.9--1'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
@@ -268,7 +338,20 @@ process ParseCoverage {
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    parse_coverage.py --input $coverage_text --output ${sample}_coverage_parsed.txt
+    #!/usr/bin/env python3
+    import csv
+
+    coverage = {}
+    with open('$coverage_text') as infile:
+        infile_reader = csv.reader(infile, delimiter='\t')
+        for row in infile_reader:
+            average_coverage = float(row[6]) / (float(row[2]) - float(row[1]) + 1)
+            coverage[row[3]] = average_coverage
+    
+    with open('${sample}_coverage_parsed.txt', 'w') as outfile:
+        outfile_writer = csv.writer(outfile, delimiter='\t')
+        for key, value in coverage.items():
+            outfile_writer.writerow([key, value])
     """
 }
 
