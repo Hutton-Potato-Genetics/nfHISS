@@ -209,7 +209,6 @@ process InputStatistics {
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    input_stats.sh $report ${sample}_input_stats.txt
     Reads=$(cat $report | grep -m 1 'reads' | cut -f5 -d ' ')
     Bases=$(cat $report | grep -m 1 'bases' | cut -f5 -d ' ')
     printf "Reads\tBases\n" > ${sample}_input_stats.txt
