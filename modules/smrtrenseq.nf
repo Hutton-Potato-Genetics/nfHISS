@@ -12,7 +12,7 @@ process TrimReads {
     val three_prime
     output:
     tuple val(sample), path("${sample}_trimmed.fastq.gz")
-    script
+    script:
     """
     cutadapt \
       -j $tasks.cpus \
