@@ -15,7 +15,7 @@ process TrimReads {
     script:
     """
     cutadapt \
-      -j $tasks.cpus \
+      -j $task.cpus \
       -g ^$five_prime \
       -a $three_prime\$ \
       -o ${sample}_trimmed.fastq.gz \
