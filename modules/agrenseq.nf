@@ -141,6 +141,30 @@ process GetSizes {
     """
 }
 
+process Plot {
+    container 'https://hub.docker.com/r/rocker/tidyverse/'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '4h'
+    input:
+    path blast_text
+    path sizes
+    path association_results
+    val threshold
+    val title
+    output:
+    path 'AgRenSeq_plot.png'
+    path 'Blast_plot.png'
+    script:
+    """
+    plot.R $association_results $threshold $title filtered_contigs.txt AgRenSeq_plot.png
+    blast_plot.R $sizes $blast_text filtered_contigs.txt $title Blast_plot.png
+    """
+}
+
 workflow agrenseq {
     accession_table = Channel
         .fromPath(params.reads)
@@ -165,7 +189,9 @@ workflow agrenseq {
 
     association = RunAssociation(matrix, association_reference, phenotype_file, nlrparser)
 
-    blast_txt = Blast(params.blast_reference, association_reference)
+    blast_text = Blast(params.blast_reference, association_reference)
 
     sizes = GetSizes(params.blast_reference)
+
+    ag_plot, blast_plot = Plot(blast_text, sizes, association, params.threshold params.title)
 }
