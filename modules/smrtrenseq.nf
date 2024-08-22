@@ -37,7 +37,7 @@ process CanuAssemble {
     val max_input_coverage
     output:
     path "assembly/${sample}_assembly.contigs.fasta"
-    path "assembly/${sample}.report"
+    path "assembly/${sample}_assembly.report"
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
