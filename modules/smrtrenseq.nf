@@ -381,7 +381,7 @@ workflow smrtrenseq {
 
     (bam, bai) = ParseAlignment(sam)
 
-    coverage = CalculateCoverage(bam, bed, bai)
+    coverage = CalculateCoverage(bam, sorted_bed, bai)
 
     parsed_coverage = ParseCoverage(coverage, reads)
 }
