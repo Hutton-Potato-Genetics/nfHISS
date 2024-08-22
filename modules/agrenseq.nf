@@ -1,3 +1,32 @@
+process TrimReads {
+    container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
+    scratch true
+    cpus 8
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '4h'
+    input:
+    tuple val(sample), path(read1), path(read2)
+    path adaptor_1
+    path adaptor_2
+    output:
+    tuple val(sample), path('R1.fastq.gz'), path('R2.fastq.gz')
+    script:
+    """
+    cutadapt \
+        -j $task.cpus \
+        --minimum-length 50 \
+        -q 20,20 \
+        -a file:$adaptor_1 \
+        -A file:$adaptor_2 \
+        -o R1.fastq.gz \
+        -p R2.fastq.gz \
+        $read1 \
+        $read2
+    """
+}
+
 process CountKmers {
     container 'docker://quay.io/biocontainers/kmc3.2.4--h6dccd9a_1'
     scratch true
