@@ -132,7 +132,7 @@ process NLRAnnotator {
 }
 
 process SummariseNLRs {
-    container 'docker://quay.io/biocontainers/python:3.9--1'
+    container 'docker://quay.io/biocontainers/python:3.12'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
@@ -159,13 +159,13 @@ process SummariseNLRs {
             count += 1
             contigs.add(row[0])
             nlr_type = row[2]
-            if nlr_type == "complete (psuedogene)" or nlr_type == "partial (pseudogene)":
+            if nlr_type == "complete (pseudogene)" or nlr_type == "partial (pseudogene)":
                 pseudogenes += 1
             if nlr_type == "complete" or nlr_type == "partial":
                 genes += 1
             if nlr_type == "complete":
                 complete += 1
-            if nlr_type == "complete (psuedogene)":
+            if nlr_type == "complete (pseudogene)":
                 complete_pseudogenes += 1
 
     with open('${sample}_NLR_summary.txt', 'w') as outfile:
