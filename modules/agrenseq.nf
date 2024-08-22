@@ -140,10 +140,12 @@ workflow agrenseq {
 
     matrix = CreatePresenceMatrix(accession_table)
 
-    reference = Channel
-        .fromPath(params.reference)
+    association_reference = Channel
+        .fromPath(params.association_reference)
 
-    nlrparser = NLRParser(reference)
+    nlrparser = NLRParser(association_reference)
 
-    association = RunAssociation(matrix, reference, phenotype_file, nlrparser)
+    association = RunAssociation(matrix, association_reference, phenotype_file, nlrparser)
+
+    blast_txt = Blast(params.blast_ref, association_reference)
 }
