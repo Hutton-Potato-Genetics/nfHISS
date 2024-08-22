@@ -43,7 +43,7 @@ process CanuAssemble {
     """
     canu \
         -d assembly \
-        -p assembly/${sample}_assembly \
+        -p ${sample}_assembly \
         genomeSize=$genome_size \
         useGrid=false \
         -pacbio-hifi $reads \
