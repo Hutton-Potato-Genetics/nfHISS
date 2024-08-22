@@ -3,6 +3,7 @@ process CountKmers {
     scratch true
     cpus 4
     memory { 8.GB * task.attempt }
+    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -21,6 +22,7 @@ process CreatePresenceMatrix {
     scratch true
     cpus 1
     memory { 8.GB * task.attempt }
+    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
@@ -38,6 +40,7 @@ process NLRParser {
     scratch true
     cpus 4
     memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '8h'
     input:
@@ -54,6 +57,7 @@ process RunAssociation {
     scratch true
     cpus 1
     memory { 16.GB * task.attempt }
+    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '6h'
     publishDir 'results', mode: 'copy'
