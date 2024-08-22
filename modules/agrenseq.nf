@@ -33,16 +33,18 @@ process CreatePresenceMatrix {
 }
 
 process NLRParser {
-    conda 'meme=5.5.5'
+    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    scratch true
     cpus 4
     memory { 4.GB * task.attempt }
+    maxRetries 3
     input:
     path reference
     output:
     path 'nlrparser.txt'
     script:
     """
-    NLR_Parser.sh -t ${task.cpus} -i $reference -o nlrparser.txt
+    nlr_parser.sh -t ${task.cpus} -i $reference -o nlrparser.txt
     """
 }
 
