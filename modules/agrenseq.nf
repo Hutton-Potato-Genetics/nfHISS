@@ -147,5 +147,5 @@ workflow agrenseq {
 
     association = RunAssociation(matrix, association_reference, phenotype_file, nlrparser)
 
-    blast_txt = Blast(params.blast_ref, association_reference)
+    blast_txt = Blast(params.blast_reference, association_reference)
 }
