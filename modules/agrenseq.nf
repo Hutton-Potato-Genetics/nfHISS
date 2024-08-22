@@ -1,7 +1,9 @@
 process CountKmers {
     container 'https://depot.galaxyproject.org/singularity/kmc:3.2.4--h6dccd9a_1'
+    scratch true
     cpus 4
     memory { 8.GB * task.attempt }
+    maxRetries 3
     time '1h'
     input:
     tuple val(sample), path(read1), path(read2)
