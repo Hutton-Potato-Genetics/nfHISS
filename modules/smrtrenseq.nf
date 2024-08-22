@@ -367,7 +367,7 @@ workflow smrtrenseq {
 
     parser_xml = NLRParser(chopped)
 
-    (annotator_text, annotator_fa) = NLRAnnotator(assembly, parser_xml, params.flanking)
+    (annotator_text, annotator_fa) = NLRAnnotator(assembly, parser_xml, reads, params.flanking)
 
     nlr_summary = SummariseNLRs(annotator_text, reads)
 
