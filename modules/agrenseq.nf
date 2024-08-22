@@ -22,6 +22,7 @@ process CreatePresenceMatrix {
     cpus 1
     memory { 8.GB * task.attempt }
     maxRetries 3
+    time '2h'
     input:
     path accession_table
     output:
@@ -38,6 +39,7 @@ process NLRParser {
     cpus 4
     memory { 4.GB * task.attempt }
     maxRetries 3
+    time '8h'
     input:
     path reference
     output:
