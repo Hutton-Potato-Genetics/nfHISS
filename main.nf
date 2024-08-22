@@ -48,7 +48,9 @@ Usage:
                                                <approximate_genome_size> \
                                                --max_input_coverage
                                                <maximum_input_coverage> \
-                                               --flanking <flanking_bases>
+                                               --flanking <flanking_bases> \
+                                               --five_prime <5'_to_trim> \
+                                               --three_prime <3'_to_trim>
 
 Options:
     --reads <reads_locations_tsv>                   Path to the read locations
@@ -68,6 +70,10 @@ Options:
     --flanking <flanking_bases>                     Number of bases to use as a
                                                     flanking region for NLR
                                                     Annotators fasta output
+    --five_prime <5'_to_trim>                       Sequence to be trimmed from
+                                                    5' end of reads
+    --three_prime <3'_to_trim>                      Sequence to be trimmed from
+                                                    3' end of reads
 """
 
 workflow {

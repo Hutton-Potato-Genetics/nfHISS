@@ -355,9 +355,11 @@ process ParseCoverage {
 }
 
 workflow smrtrenseq {
-    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) } | TrimReads
+    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
+    
+    trimmed_reads = TrimReads(reads, params.five_prime, params.three_prime)
 
-    (assembly, report) = CanuAssemble(reads, params.genome_size, params.max_input_coverage)
+    (assembly, report) = CanuAssemble(trimmed_reads, params.genome_size, params.max_input_coverage)
 
     stats = SeqkitStats(assembly, reads)
 
