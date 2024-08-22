@@ -1,5 +1,5 @@
 process CountKmers {
-    container 'https://depot.galaxyproject.org/singularity/kmc:3.2.1--hf1761c0_2'
+    container 'https://depot.galaxyproject.org/singularity/kmc:3.2.4--h6dccd9a_1'
     cpus 4
     memory { 8.GB * task.attempt }
     time '1h'
