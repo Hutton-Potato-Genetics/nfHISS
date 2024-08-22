@@ -49,10 +49,12 @@ process NLRParser {
 }
 
 process RunAssociation {
+    scratch true
     cpus 1
     memory { 16.GB * task.attempt }
+    maxRetries 3
     time '6h'
-    publishDir 'results'
+    publishDir 'results', mode: 'copy'
     input:
     path presence_matrix
     path reference
