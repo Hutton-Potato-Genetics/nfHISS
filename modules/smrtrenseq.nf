@@ -15,11 +15,11 @@ process TrimReads {
     script:
     """
     cutadapt \
-      -j $task.cpus \
-      -g ^$five_prime \
-      -a $three_prime\$ \
-      -o ${sample}_trimmed.fastq.gz \
-      $reads
+        -j $task.cpus \
+        -g ^$five_prime \
+        -a $three_prime\$ \
+        -o ${sample}_trimmed.fastq.gz \
+        $reads
     """
 }
 
@@ -42,13 +42,13 @@ process CanuAssemble {
     script:
     """
     canu \
-      -d assembly \
-      -p assembly \
-      genomeSize=$genome_size \
-      useGrid=false \
-      -pacbio-hifi $reads \
-      maxInputCoverage=$max_input_coverage \
-      batMemory=32g
+        -d assembly \
+        -p assembly \
+        genomeSize=$genome_size \
+        useGrid=false \
+        -pacbio-hifi $reads \
+        maxInputCoverage=$max_input_coverage \
+        batMemory=32g
     """
 }
 
