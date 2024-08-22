@@ -18,8 +18,10 @@ process CountKmers {
 }
 
 process CreatePresenceMatrix {
+    scratch true
     cpus 1
     memory { 8.GB * task.attempt }
+    maxRetries 3
     input:
     path accession_table
     output:
