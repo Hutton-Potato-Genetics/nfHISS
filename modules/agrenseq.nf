@@ -3,7 +3,7 @@ process TrimReads {
     scratch true
     cpus 8
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
     input:
@@ -32,7 +32,7 @@ process CountKmers {
     scratch true
     cpus 4
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
@@ -51,7 +51,7 @@ process CreatePresenceMatrix {
     scratch true
     cpus 1
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
@@ -69,7 +69,7 @@ process NLRParser {
     scratch true
     cpus 4
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '8h'
     input:
@@ -86,10 +86,9 @@ process RunAssociation {
     scratch true
     cpus 1
     memory { 16.GB * task.attempt }
-    errorStrategy { task.exitStats == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '6h'
-    publishDir 'results', mode: 'copy'
     input:
     path presence_matrix
     path reference
@@ -97,9 +96,30 @@ process RunAssociation {
     path nlrparser
     output:
     path 'agrenseq_result.txt'
+    publishDir 'results', mode: 'copy'
     script:
     """
     RunAssociation.sh -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
+    """
+}
+
+process Blast {
+    container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
+    scratch true
+    cpus 8
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '8h'
+    input:
+    path blast_reference
+    path association_reference
+    output:
+    path 'blast_sorted.txt'
+    script:
+    """
+    makeblastdb -in $blast_reference -dbtype nucl -out blast_ref
+    blastn -query $association_reference -db blast_ref -outfmt 6 -num_threads $task.cpus | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 --merge > blast_sorted.txt
     """
 }
 
