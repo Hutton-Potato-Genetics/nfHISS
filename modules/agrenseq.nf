@@ -123,6 +123,24 @@ process Blast {
     """
 }
 
+process GetSizes {
+    container 'docker://quay.io/biocontainers/bioawk:1.0--he4a0461_12'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path blast_reference
+    output:
+    'sizes.txt'
+    script:
+    """
+    bioawk -c fastx '{{ print \$name, length(\$seq) }}' $blast_reference > sizes.txt
+    """
+}
+
 workflow agrenseq {
     accession_table = Channel
         .fromPath(params.reads)
@@ -148,4 +166,6 @@ workflow agrenseq {
     association = RunAssociation(matrix, association_reference, phenotype_file, nlrparser)
 
     blast_txt = Blast(params.blast_reference, association_reference)
+
+    sizes = GetSizes(params.blast_reference)
 }
