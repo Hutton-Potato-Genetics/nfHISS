@@ -68,7 +68,7 @@ process SeqkitStats {
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    seqkit stats -b $assembly | sed 's/_assembly\.contigs//g' > ${sample}_statistics.txt
+    seqkit stats -b $assembly \| sed 's/_assembly\.contigs//g' > ${sample}_statistics.txt
     """
 }
 
