@@ -166,11 +166,11 @@ process Plot {
 }
 
 workflow agrenseq {
-    accession_table = Channel
-        .fromPath(params.reads)
-        .splitCsv(header: true, sep: "\t")
-        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) } \
-        | CountKmers \
+    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) }
+
+    trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
+
+    accession_table =  CountKmers(trimmed_reads) \
         | map { it -> "${it[0]}\t${it[1]}" } \
         | collectFile(name: "accession.tsv", newLine: true)
 
