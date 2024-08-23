@@ -265,8 +265,7 @@ process MapHiFi {
     maxRetries 3
     time '12h'
     input:
-    tuple val(sample), path(reads)
-    tuple val(sample), path(assembly)
+    tuple val(sample), path(reads), path(assembly)
     output:
     tuple val(sample), path('aligned.sam')
     script:
@@ -305,9 +304,7 @@ process CalculateCoverage {
     maxRetries 3
     time '2h'
     input:
-    tuple val(sample), path(bam)
-    tuple val(sample), path(nlr_bed)
-    tuple val(sample), path(index)
+    tuple val(sample), path(bam), path(nlr_bed), path(index)
     output:
     tuple val(sample), path('nlr_coverage.txt')
     script:
@@ -371,11 +368,11 @@ workflow smrtrenseq {
 
     sorted_bed = SortNLRBed(nlr_bed)
 
-    sam = MapHiFi(reads, assembly)
+    sam = MapHiFi(reads.join(assembly))
 
     (bam, bai) = ParseAlignment(sam)
 
-    coverage = CalculateCoverage(bam, sorted_bed, bai)
+    coverage = CalculateCoverage(bam.join(sorted_bed.join(bai)))
 
     parsed_coverage = ParseCoverage(coverage)
 }
