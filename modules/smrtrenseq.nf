@@ -72,7 +72,7 @@ process SeqkitStats {
 }
 
 process ChopSequences {
-    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    conda 'bioconda::meme=5.5.6 conda-forge::openjdk=20.0.0'
     scratch true
     cpus 1
     memory { 2.GB * task.attempt }
@@ -90,7 +90,7 @@ process ChopSequences {
 }
 
 process NLRParser {
-    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    conda 'bioconda::meme=5.5.6 conda-forge::openjdk=20.0.0'
     scratch true
     cpus 2
     memory { 4.GB * task.attempt }
@@ -108,7 +108,7 @@ process NLRParser {
 }
 
 process NLRAnnotator {
-    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    conda 'bioconda::meme=5.5.6 conda-forge::openjdk=20.0.0'
     scratch true
     cpus 1
     memory { 2.GB * task.attempt }
