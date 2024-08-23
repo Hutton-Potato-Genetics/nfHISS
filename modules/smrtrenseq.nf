@@ -355,21 +355,21 @@ workflow smrtrenseq {
 
     (assembly, report) = CanuAssemble(trimmed_reads, params.genome_size, params.max_input_coverage)
 
-    stats = SeqkitStats(assembly, reads)
+    stats = SeqkitStats(assembly)
 
     chopped = ChopSequences(assembly)
 
     parser_xml = NLRParser(chopped)
 
-    (annotator_text, annotator_fa) = NLRAnnotator(assembly, parser_xml, reads, params.flanking)
+    (annotator_text, annotator_fa) = NLRAnnotator(assembly, parser_xml, params.flanking)
 
-    nlr_summary = SummariseNLRs(annotator_text, reads)
+    nlr_summary = SummariseNLRs(annotator_text)
 
-    input_stats = InputStatistics(report, reads)
+    input_stats = InputStatistics(report)
 
     nlr_bed = NLR2Bed(annotator_text)
 
-    sorted_bed = SortNLRBed(nlr_bed, reads)
+    sorted_bed = SortNLRBed(nlr_bed)
 
     sam = MapHiFi(reads, assembly)
 
@@ -377,5 +377,5 @@ workflow smrtrenseq {
 
     coverage = CalculateCoverage(bam, sorted_bed, bai)
 
-    parsed_coverage = ParseCoverage(coverage, reads)
+    parsed_coverage = ParseCoverage(coverage)
 }
