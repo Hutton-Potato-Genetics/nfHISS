@@ -36,8 +36,8 @@ process CanuAssemble {
     val genome_size
     val max_input_coverage
     output:
-    path "assembly/${sample}_assembly.contigs.fasta"
-    path "assembly/${sample}_assembly.report"
+    tuple val(sample), path("assembly/${sample}_assembly.contigs.fasta")
+    tuple val(sample), path("assembly/${sample}_assembly.report")
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
@@ -61,10 +61,9 @@ process SeqkitStats {
     maxRetries 3
     time '1h'
     input:
-    path assembly
-    tuple val(sample), path(reads)
+    tuple val(sample), path(assembly)
     output:
-    path "${sample}_statistics.txt"
+    tuple val(sample), path("${sample}_statistics.txt")
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
@@ -81,9 +80,9 @@ process ChopSequences {
     maxRetries 3
     time '2h'
     input:
-    path assembly
+    tuple val(sample), path(assembly)
     output:
-    path 'chopped.fa'
+    tuple val(sample), path('chopped.fa')
     script:
     """
     chop_sequences.sh -i $assembly -o chopped.fa
@@ -99,9 +98,9 @@ process NLRParser {
     maxRetries 3
     time '8h'
     input:
-    path chopped
+    tuple val(sample), path(chopped)
     output:
-    path 'parser.xml'
+    tuple val(sample), path('parser.xml')
     script:
     """
     nlr_parser.sh -t 2 -i $chopped -o parser.xml
@@ -117,13 +116,12 @@ process NLRAnnotator {
     maxRetries 3
     time '4h'
     input:
-    path assembly
+    tuple val(sample), path(assembly)
     path parser_xml
-    tuple val(sample), path(reads)
     val flanking
     output:
-    path "${sample}_NLR_annotator.txt"
-    path "${sample}_NLR_annotator.fa"
+    tuple val(sample), path("${sample}_NLR_annotator.txt")
+    tuple val(sample), path("${sample}_NLR_annotator.fa")
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
@@ -140,10 +138,9 @@ process SummariseNLRs {
     maxRetries 3
     time '2h'
     input:
-    path annotator_text
-    tuple val(sample), path(reads)
+    tuple val(sample), path(annotator_text)
     output:
-    path "${sample}_NLR_summary.txt"
+    tuple val(sample), path("${sample}_NLR_summary.txt")
     publishDir "results/${sample}", mode: 'copy'
     script:
    """
@@ -202,10 +199,9 @@ process InputStatistics {
     maxRetries 3
     time '2h'
     input:
-    path report
-    tuple val(sample), path(reads)
+    tuple val(sample), path(report)
     output:
-    path "${sample}_input_stats.txt"
+    tuple val(sample), path("${sample}_input_stats.txt")
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
@@ -225,9 +221,9 @@ process NLR2Bed {
     maxRetries 3
     time '2h'
     input:
-    path annotator_text
+    tuple val(sample), path(annotator_text)
     output:
-    path 'NLR_Annotator.bed'
+    tuple val(sample), path('NLR_Annotator.bed')
     script:
     """
     #!/usr/bin/env python3
@@ -250,10 +246,9 @@ process SortNLRBed {
     maxRetries 3
     time '1h'
     input:
-    path annotator_bed
-    tuple val(sample), path(reads)
+    tuple val(sample), path(annotator_bed)
     output:
-    path "${sample}_NLR_Annotator_sorted.bed"
+    tuple val(sample), path("${sample}_NLR_Annotator_sorted.bed")
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
@@ -271,9 +266,9 @@ process MapHiFi {
     time '12h'
     input:
     tuple val(sample), path(reads)
-    path assembly
+    tuple val(sample), path(assembly)
     output:
-    path 'aligned.sam'
+    tuple val(sample), path('aligned.sam')
     script:
     """
     minimap2 -x map-hifi -t $task.cpus -a -o aligned.sam $assembly $reads
@@ -289,10 +284,10 @@ process ParseAlignment {
     maxRetries 3
     time '4h'
     input:
-    path sam
+    tuple val(sample), path(sam)
     output:
-    path 'aligned.bam'
-    path 'aligned.bam.bai'
+    tuple val(sample), path('aligned.bam')
+    tuple val(sample), path('aligned.bam.bai')
     script:
     """
     samtools view -F 256 $sam -b -o convert.bam -@ $task.cpus
@@ -310,11 +305,11 @@ process CalculateCoverage {
     maxRetries 3
     time '2h'
     input:
-    path bam
-    path nlr_bed
-    path index
+    tuple val(sample), path(bam)
+    tuple val(sample), path(nlr_bed)
+    tuple val(sample), path(index)
     output:
-    path 'nlr_coverage.txt'
+    tuple val(sample), path('nlr_coverage.txt')
     script:
     """
     samtools bedcov $nlr_bed $bam > nlr_coverage.txt
@@ -330,10 +325,9 @@ process ParseCoverage {
     maxRetries 3
     time '2h'
     input:
-    path coverage_text
-    tuple val(sample), path(reads)
+    tuple val(sample), path(coverage_text)
     output:
-    path "${sample}_coverage_parsed.txt"
+    tuple val(sample), path("${sample}_coverage_parsed.txt")
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
