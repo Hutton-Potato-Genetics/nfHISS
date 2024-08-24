@@ -116,8 +116,7 @@ process NLRAnnotator {
     maxRetries 3
     time '4h'
     input:
-    tuple val(sample), path(assembly)
-    path parser_xml
+    tuple val(sample), path(assembly), path(parser_xml)
     val flanking
     output:
     tuple val(sample), path("${sample}_NLR_annotator.txt")
@@ -358,7 +357,7 @@ workflow smrtrenseq {
 
     parser_xml = NLRParser(chopped)
 
-    (annotator_text, annotator_fa) = NLRAnnotator(assembly, parser_xml, params.flanking)
+    (annotator_text, annotator_fa) = NLRAnnotator(assembly.join(parser_xml), params.flanking)
 
     nlr_summary = SummariseNLRs(annotator_text)
 
