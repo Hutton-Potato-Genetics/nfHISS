@@ -72,7 +72,7 @@ process SeqkitStats {
 }
 
 process ChopSequences {
-    conda 'bioconda::meme=5.5.6 conda-forge::openjdk=20.0.0'
+    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
     cpus 1
     memory { 2.GB * task.attempt }
@@ -90,7 +90,7 @@ process ChopSequences {
 }
 
 process NLRParser {
-    conda 'bioconda::meme=5.5.6 conda-forge::openjdk=20.0.0'
+    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
     cpus 2
     memory { 4.GB * task.attempt }
@@ -108,7 +108,7 @@ process NLRParser {
 }
 
 process NLRAnnotator {
-    conda 'bioconda::meme=5.5.6 conda-forge::openjdk=20.0.0'
+    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
     cpus 1
     memory { 2.GB * task.attempt }
