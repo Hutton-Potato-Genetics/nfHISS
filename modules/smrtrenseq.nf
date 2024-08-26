@@ -103,7 +103,7 @@ process NLRParser {
     tuple val(sample), path('parser.xml')
     script:
     """
-    nlr_parser.sh -t 2 -i $chopped -o parser.xml
+    nlr_parser.sh -t $task.cpus -i $chopped -c parser.xml
     """
 }
 
