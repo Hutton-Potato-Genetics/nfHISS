@@ -229,7 +229,7 @@ process NLR2Bed {
         outfile_writer = csv.writer(outfile, delimiter='\t')
 
         for row in infile_reader:
-            outfile_writer.writerow([row[0], row[3], row[4], row[1], 0, row[5]])
+            outfile_writer.writerow([row[0], str(int(row[3]) - 1), row[4], row[1], 0, row[5]])
     """
 }
 
