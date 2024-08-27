@@ -61,8 +61,7 @@ process SamtoolsFaidx {
 }
 
 process BowtieBuild {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/bowtie2:2.5.4--h7071971_4'
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
