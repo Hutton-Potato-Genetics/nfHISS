@@ -14,12 +14,8 @@ process TrimReads {
     tuple val(sample), path("trimmed.fastq.gz")
     script:
     """
-    cutadapt \
-        -j $task.cpus \
-        -g ^$five_prime \
-        -a $three_prime\$ \
-        -o trimmed.fastq.gz \
-        $reads
+    cutadapt -j $task.cpus -g ^$five_prime $reads | cutadapt -j $task.cpus -a $three_prime\$ - > trimmed.fastq
+    gzip trimmed.fastq
     """
 }
 
