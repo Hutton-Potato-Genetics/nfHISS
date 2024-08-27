@@ -3,7 +3,7 @@ process TrimBed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategu { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     time '1h'
     input:
     path bed
@@ -114,6 +114,26 @@ process BowtieAlign {
       --no-unal \
       --no-discordant \
       -k $max_align \
+    """
+}
+
+process ParseAlignment {
+    container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
+    scratch true
+    cpus 2
+    memory { 2.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    tuple val(sample), path(sam)
+    output:
+    tuple val(sample), path('aligned.bam')
+    tuple val(sample), path('aligned.bam.bai')
+    script:
+    """
+    samtools sort --threads $task.cpus -l 9 $sam -o aligned.bam
+    samtools index aligned.bam aligned.bam.bai
     """
 }
 
