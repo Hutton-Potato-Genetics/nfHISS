@@ -82,17 +82,18 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/bowtie2:2.5.4--h7071971_4'
     scratch true
     cpus 8
-    memory { 8.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '6h'
     input:
     path bowtie2_index
     tuple val(sample), path(read1), path(read2)
+    val score
+    val max_align
     output:
     path "${sample}.bam"
     path "${sample}.bam.bai"
@@ -105,17 +106,14 @@ process BowtieAlign {
       --rg-id $sample \
       --rg SM:${sample} \
       -p ${task.cpus} \
-      --score-min L,0,-0.24 \
+      --score-min $score \
       --phred33 \
       --fr \
       --maxins 1000 \
       --very-sensitive \
       --no-unal \
       --no-discordant \
-      -k 10 \
-      | samtools sort -@ ${task.cpus} -o ${sample}.bam
-
-    samtools index ${sample}.bam
+      -k $max_align \
     """
 }
 
