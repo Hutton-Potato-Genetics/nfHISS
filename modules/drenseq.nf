@@ -1,14 +1,3 @@
-//conda_env = """
-//bioconda::fastp=0.23.4
-//bioconda::freebayes=1.3.7
-//bioconda::sambamba=1.0
-//bioconda::samtools=1.19.2
-//bioconda::bcftools=1.19
-//bioconda::bowtie2=2.5.3
-//bioconda::htslib=1.19.1
-//bioconda::bedtools=2.31.1
-//"""
-
 // Trim the bed file to an expected size
 process TrimBed {
     cpus 1
