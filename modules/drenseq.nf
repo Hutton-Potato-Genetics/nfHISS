@@ -1,7 +1,9 @@
 // Trim the bed file to an expected size
 process TrimBed {
+    scratch true
     cpus 1
-    memory '1 GB'
+    memory { 1.GB * task.attempt }
+    errorStrategu { task.exitStatus == 137 ? 'retry' : 'finish' }
     time '1h'
     input:
     path bed
@@ -62,6 +64,7 @@ process SamtoolsFaidx {
 
 process BowtieBuild {
     container 'docker://quay.io/biocontainers/bowtie2:2.5.4--h7071971_4'
+    scratch true
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
