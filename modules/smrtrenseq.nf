@@ -5,7 +5,7 @@ process TrimReads {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '15m'
     input:
     tuple val(sample), path(reads)
     val five_prime
@@ -26,7 +26,7 @@ process CanuAssemble {
     memory { 36.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '48h'
+    time '4h'
     input:
     tuple val(sample), path(reads)
     val genome_size
@@ -55,7 +55,7 @@ process SeqkitStats {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '15m'
     input:
     tuple val(sample), path(assembly)
     output:
@@ -70,11 +70,11 @@ process SeqkitStats {
 process ChopSequences {
     conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
-    cpus 1
+    cpus 2
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '15m'
     input:
     tuple val(sample), path(assembly)
     output:
@@ -89,10 +89,10 @@ process NLRParser {
     conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
     cpus 2
-    memory { 4.GB * task.attempt }
+    memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '8h'
+    time '15m'
     input:
     tuple val(sample), path(chopped)
     output:
@@ -106,11 +106,11 @@ process NLRParser {
 process NLRAnnotator {
     conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
-    cpus 1
+    cpus 2
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '15m'
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
@@ -131,14 +131,14 @@ process SummariseNLRs {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '15m'
     input:
     tuple val(sample), path(annotator_text)
     output:
     tuple val(sample), path("${sample}_NLR_summary.txt")
     publishDir "results/${sample}", mode: 'copy'
     script:
-   """
+    """
     #!/usr/bin/env python3
     import csv
 
@@ -192,7 +192,7 @@ process InputStatistics {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '15m'
     input:
     tuple val(sample), path(report)
     output:
@@ -214,7 +214,7 @@ process NLR2Bed {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '15m'
     input:
     tuple val(sample), path(annotator_text)
     output:
@@ -239,7 +239,7 @@ process SortNLRBed {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '15m'
     input:
     tuple val(sample), path(annotator_bed)
     output:
@@ -255,10 +255,10 @@ process MapHiFi {
     container 'https://depot.galaxyproject.org/singularity/minimap2:2.28--he4a0461_0'
     scratch true
     cpus 8
-    memory { 8.GB * task.attempt }
+    memory { 6.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '12h'
+    time '15m'
     input:
     tuple val(sample), path(reads), path(assembly)
     output:
@@ -276,7 +276,7 @@ process ParseAlignment {
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '15m'
     input:
     tuple val(sample), path(sam)
     output:
@@ -294,10 +294,10 @@ process CalculateCoverage {
     container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
     scratch true
     cpus 1
-    memory { 2.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '15m'
     input:
     tuple val(sample), path(bam), path(nlr_bed), path(index)
     output:
@@ -315,7 +315,7 @@ process ParseCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '15m'
     input:
     tuple val(sample), path(coverage_text)
     output:
