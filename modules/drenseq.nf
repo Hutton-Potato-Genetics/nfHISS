@@ -95,8 +95,7 @@ process BowtieAlign {
     val score
     val max_align
     output:
-    path "${sample}.bam"
-    path "${sample}.bam.bai"
+    tuple val(sample), path('aligned.sam')
     script:
     """
     bowtie2 \
@@ -114,6 +113,7 @@ process BowtieAlign {
       --no-unal \
       --no-discordant \
       -k $max_align \
+      -S aligned.sam
     """
 }
 
@@ -132,6 +132,7 @@ process ParseAlignment {
     tuple val(sample), path('aligned.bam.bai')
     script:
     """
+    samtools view $sam -b -o aligned_unsorted.bam
     samtools sort --threads $task.cpus -l 9 $sam -o aligned.bam
     samtools index aligned.bam aligned.bam.bai
     """
