@@ -132,9 +132,9 @@ process ParseAlignment {
     tuple val(sample), path('aligned.bam.bai')
     script:
     """
-    samtools view $sam -b -o aligned_unsorted.bam
-    samtools sort --threads $task.cpus -l 9 $sam -o aligned.bam
-    samtools index aligned.bam aligned.bam.bai
+    samtools view $sam -b -o aligned_unsorted.bam -@ $task.cpus
+    samtools sort -l 9 $sam -o aligned.bam -@ $task.cpus
+    samtools index aligned.bam aligned.bam.bai -@ $task.cpus
     """
 }
 
