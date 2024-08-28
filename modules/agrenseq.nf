@@ -193,5 +193,5 @@ workflow agrenseq {
 
     sizes = GetSizes(params.blast_reference)
 
-    ag_plot, blast_plot = Plot(blast_text, sizes, association, params.threshold params.title)
+    ag_plot, blast_plot = Plot(blast_text, sizes, association, params.threshold, params.title)
 }
