@@ -119,7 +119,7 @@ process Blast {
     script:
     """
     makeblastdb -in $blast_reference -dbtype nucl -out blast_ref
-    blastn -query $association_reference -db blast_ref -outfmt 6 -num_threads $task.cpus | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 --merge > blast_sorted.txt
+    blastn -query $association_reference -db blast_ref -outfmt 6 -num_threads $task.cpus | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 -m > blast_sorted.txt
     """
 }
 
