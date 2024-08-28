@@ -179,8 +179,7 @@ workflow agrenseq {
 
     matrix = CreatePresenceMatrix(accession_table)
 
-    association_reference = Channel
-        .fromPath(params.association_reference)
+    association_reference = Channel.fromPath(params.association_reference)
 
     nlrparser = NLRParser(association_reference)
 
