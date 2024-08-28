@@ -226,7 +226,7 @@ process NLR2Bed {
 
     with open('$annotator_text') as infile, open('NLR_Annotator.bed', 'w') as outfile:
         infile_reader = csv.reader(infile, delimiter='\t')
-        outfile_writer = csv.writer(outfile, delimiter='\t')
+        outfile_writer = csv.writer(outfile, delimiter='\t', dialect=csv.unix_dialect)
 
         for row in infile_reader:
             outfile_writer.writerow([row[0], str(int(row[3]) - 1), row[4], row[1], 0, row[5]])
