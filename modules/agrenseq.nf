@@ -65,7 +65,7 @@ process CreatePresenceMatrix {
 }
 
 process NLRParser {
-    container 'docker://quay.io/biocontainers/meme:5.5.6--pl5321h4242488_0'
+    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
     cpus 4
     memory { 4.GB * task.attempt }
