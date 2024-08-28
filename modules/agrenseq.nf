@@ -166,7 +166,7 @@ process Plot {
 }
 
 workflow agrenseq {
-    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) }
+    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.R1), file(row.R2)) }
 
     trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
 
