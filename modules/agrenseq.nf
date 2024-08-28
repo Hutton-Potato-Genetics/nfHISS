@@ -28,7 +28,7 @@ process TrimReads {
 }
 
 process CountKmers {
-    container 'docker://quay.io/biocontainers/kmc3.2.4--h6dccd9a_1'
+    container 'docker://quay.io/biocontainers/kmc:3.2.4--h6dccd9a_1'
     scratch true
     cpus 4
     memory { 8.GB * task.attempt }
