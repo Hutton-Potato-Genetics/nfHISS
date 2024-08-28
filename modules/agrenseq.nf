@@ -170,20 +170,13 @@ workflow agrenseq {
 
     trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
 
-    accession_table =  CountKmers(trimmed_reads) \
-        | map { it -> "${it[0]}\t${it[1]}" } \
-        | collectFile(name: "accession.tsv", newLine: true)
+    accession_table =  CountKmers(trimmed_reads) | map { it -> "${it[0]}\t${it[1]}" } | collectFile(name: "accession.tsv", newLine: true)
 
-    phenotype_file = Channel
-        .fromPath(params.reads)
-        .splitCsv(header: true, sep: "\t")
-        .map { row -> "${row.sample}\t${row.score}" } \
-        | collectFile(name: "phenotype.tsv", newLine: true)
+    phenotype_file = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> "${row.sample}\t${row.score}" } | collectFile(name: "phenotype.tsv", newLine: true)
 
     matrix = CreatePresenceMatrix(accession_table)
 
-    association_reference = Channel
-        .fromPath(params.association_reference)
+    association_reference = Channel.fromPath(params.association_reference)
 
     nlrparser = NLRParser(association_reference)
 
