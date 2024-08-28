@@ -174,12 +174,16 @@ workflow agrenseq {
         | map { it -> "${it[0]}\t${it[1]}" } \
         | collectFile(name: "accession.tsv", newLine: true)
 
-    phenotype_file = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> "${row.sample}\t${row.score}" } \
+    phenotype_file = Channel
+        .fromPath(params.reads)
+        .splitCsv(header: true, sep: "\t")
+        .map { row -> "${row.sample}\t${row.score}" } \
         | collectFile(name: "phenotype.tsv", newLine: true)
 
     matrix = CreatePresenceMatrix(accession_table)
 
-    association_reference = Channel.fromPath(params.association_reference)
+    association_reference = Channel
+        .fromPath(params.association_reference)
 
     nlrparser = NLRParser(association_reference)
 
