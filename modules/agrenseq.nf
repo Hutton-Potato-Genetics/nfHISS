@@ -60,7 +60,7 @@ process CreatePresenceMatrix {
     path 'presence_matrix.txt'
     script:
     """
-    CreatePresenceMatrix.sh -i $accession_table -o presence_matrix.txt
+    create_presence_matrix.sh -i $accession_table -o presence_matrix.txt
     """
 }
 
@@ -99,7 +99,7 @@ process RunAssociation {
     publishDir 'results', mode: 'copy'
     script:
     """
-    RunAssociation.sh -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
+    run_association.sh -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
     """
 }
 
