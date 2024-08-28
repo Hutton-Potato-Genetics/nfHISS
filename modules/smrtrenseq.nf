@@ -223,6 +223,7 @@ process NLR2Bed {
     """
     #!/usr/bin/env python3
     import csv
+    import os
 
     with open('$annotator_text') as infile, open('NLR_Annotator.bed', 'w') as outfile:
         infile_reader = csv.reader(infile, delimiter='\t')
