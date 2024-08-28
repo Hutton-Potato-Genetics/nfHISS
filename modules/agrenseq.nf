@@ -134,7 +134,7 @@ process GetSizes {
     input:
     path blast_reference
     output:
-    'sizes.txt'
+    path 'sizes.txt'
     script:
     """
     bioawk -c fastx '{{ print \$name, length(\$seq) }}' $blast_reference > sizes.txt
