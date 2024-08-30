@@ -50,7 +50,7 @@ process CountKmers {
 process CreatePresenceMatrix {
     scratch true
     cpus 1
-    memory { 8.GB * task.attempt }
+    memory { 32.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
