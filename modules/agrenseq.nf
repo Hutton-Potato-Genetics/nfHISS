@@ -53,7 +53,7 @@ process CreatePresenceMatrix {
     memory { 32.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '24h'
     input:
     path accession_table
     output:
