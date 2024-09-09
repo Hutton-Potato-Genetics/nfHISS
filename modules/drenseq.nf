@@ -162,6 +162,24 @@ process StrictFilter {
     """   
 }
 
+process IndexStrict {
+    container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '2h'
+    input:
+    tuple val(sample), path(strict)
+    output:
+    tuple val(sample), path 'strict.bam.bai'
+    script:
+    """
+    samtools index $strict strict.bam.bai
+    """
+}
+
 process BedtoolsCoverage {
     //conda conda_env
     container 'swiftseal/drenseq:latest'
