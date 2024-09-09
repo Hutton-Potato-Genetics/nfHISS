@@ -60,7 +60,7 @@ Options:
     --genome_size <approximate_genome_size>         Approximate expected
                                                     assembly size - parameter
                                                     for HiCanu
-    --max_input_coverage <maximum_input_coverage    Maximum input coverage used
+    --max_input_coverage <maximum_input_coverage>   Maximum input coverage used
                                                     by HiCanu. If you have more
                                                     coverage than this, HiCanu
                                                     will randomly downsample
