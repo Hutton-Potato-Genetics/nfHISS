@@ -139,8 +139,7 @@ process ParseAlignment {
 }
 
 process StrictFilter {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/sambamba:1.0.1--h6f6fda4_2'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
@@ -148,20 +147,18 @@ process StrictFilter {
     maxRetries 3
     time '2h'
     input:
-    path bam
-    path bai
+    tuple val(sample), path(bam)
+    tuple val(sample), path(bai)
     output:
-    path "${bam.baseName}.strict.bam"
-    path "${bam.baseName}.strict.bam.bai"
+    tuple val(sample), path('strict.bam')
     script:
     """    
     sambamba view \
         --format=bam \
+        -l 9 \
         --filter='[NM] == 0' \
-        $bam \
-        > ${bam.baseName}.strict.bam
-
-    samtools index ${bam.baseName}.strict.bam
+        -o strict.bam \
+        $bam
     """   
 }
 
