@@ -250,6 +250,25 @@ process IdentifyBaitRegions {
     """
 }
 
+process AnnotatorBaits {
+    container 'docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_2'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '2h'
+    input:
+    path bait_regions
+    path trimmed_bed
+    output:
+    path 'nlr_bait_regions.bed'
+    script:
+    """
+    bedtools intersect -a $trimmed_bed -b $bait_regions > nlr_bait_regions.bed
+    """
+}
+
 process BedtoolsCoverage {
     //conda conda_env
     container 'swiftseal/drenseq:latest'
