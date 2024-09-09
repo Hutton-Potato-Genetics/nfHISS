@@ -1,4 +1,3 @@
-// Trim the bed file to an expected size
 process TrimBed {
     scratch true
     cpus 1
@@ -206,6 +205,27 @@ process BaitsBlasting {
         -qcov_hsp_perc $coverage \
         -e-value 1e-5 \
         -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen len qcovs qcovhsp'
+    """
+}
+
+process IdentifyBaitRegions {
+    container 'https://hub.docker.com/r/rocker/tidyverse/'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy {task.exitStatus == 137 ? 'retry' : 'finish'}
+    maxRetries 3
+    time '2h'
+    input:
+    path blast_out
+    path headers
+    path reference
+    val flank
+    output:
+    path 'bait_regions.bed'
+    script:
+    """
+    RangeReduction.R $blast_out bait_regions.bed $flank $headers $reference
     """
 }
 
