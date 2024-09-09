@@ -208,24 +208,45 @@ process BaitsBlasting {
     """
 }
 
+process Headers {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path trimmed_bed
+    path reference
+    output:
+    path 'nlr_headers.txt'
+    path 'reference_headers.txt'
+    script:
+    """
+    echo "gene" > nlr_headers.txt
+    cat $trimmed_bed | cut -f4 >> nlr_headers.txt
+    cat $reference | grep '>' | sed 's/>//g' > reference_headers.txt
+    """
+}
+
 process IdentifyBaitRegions {
     container 'https://hub.docker.com/r/rocker/tidyverse/'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy {task.exitStatus == 137 ? 'retry' : 'finish'}
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '2h'
     input:
     path blast_out
-    path headers
+    path reference_headers
     path reference
     val flank
     output:
     path 'bait_regions.bed'
     script:
     """
-    RangeReduction.R $blast_out bait_regions.bed $flank $headers $reference
+    RangeReduction.R $blast_out bait_regions.bed $flank $reference_headers $reference
     """
 }
 
