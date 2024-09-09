@@ -180,6 +180,35 @@ process IndexStrict {
     """
 }
 
+process BaitsBlasting {
+    container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
+    scratch true
+    cpus 8
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '8h'
+    input:
+    path reference
+    path baits
+    val identity
+    val coverage
+    output:
+    path 'blast_out.txt'
+    script:
+    """
+    makeblastdb -in $reference -out blast_db -dbtype nucl
+    blastn \
+        -db blast_db \
+        -query $baits \
+        -out blast_out.txt \
+        -perc_identity $identity \
+        -qcov_hsp_perc $coverage \
+        -e-value 1e-5 \
+        -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen len qcovs qcovhsp'
+    """
+}
+
 process BedtoolsCoverage {
     //conda conda_env
     container 'swiftseal/drenseq:latest'
