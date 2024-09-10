@@ -60,8 +60,9 @@ process CreatePresenceMatrix {
     path 'presence_matrix.txt'
     script:
     """
-    memory=$(echo ${task.memory} | | sed 's/ //g' | sed 's/B//g)
-    create_presence_matrix.sh $memory -i $accession_table -o presence_matrix.txt
+    memory=${task.memory}
+    memory_parsed=$(echo $memory | sed 's/ //g' | sed 's/B//g)
+    create_presence_matrix.sh $memory_parsed -i $accession_table -o presence_matrix.txt
     """
 }
 
