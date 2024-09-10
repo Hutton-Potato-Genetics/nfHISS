@@ -104,26 +104,7 @@ process RunAssociation {
     """
 }
 
-process BlastDB {
-    container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
-    scratch true
-    cpus 1
-    memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '8h'
-    input:
-    path blast_reference
-    output:
-    path('blast_ref/reference*', arity: 8)
-    path 'blast_ref'
-    script:
-    """
-    makeblastdb -in $blast_reference -dbtype nucl -out blast_ref/reference
-    """
-}
-
-process BlastN {
+process Blast {
     container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
     scratch true
     cpus 8
@@ -132,13 +113,15 @@ process BlastN {
     maxRetries 3
     time '8h'
     input:
-    path blast_ref
+    path blast_reference
     path association_reference
     output:
     path 'blast_sorted.txt'
     script:
     """
-    blastn -query $association_reference -db $blast_ref/reference -outfmt 6 -num_threads $task.cpus | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 -m > blast_sorted.txt
+    makeblastdb -in $blast_reference -dbtype nucl -out blast_ref
+    blastn -query $association_reference -db blast_ref -outfmt 6 -num_threads $task.cpus -out blast.txt
+    cat blast.txt | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 -m > blast_sorted.txt
     """
 }
 
@@ -208,9 +191,7 @@ workflow agrenseq {
 
     association = RunAssociation(matrix, association_reference, phenotype_file, nlrparser)
 
-    (blast_reference_files, blast_reference_dir) = BlastDB(params.blast_reference)
-
-    blast_text = BlastN(blast_reference_dir, association_reference)
+    blast_text = Blast(params.blast_reference, association_reference)
 
     sizes = GetSizes(params.blast_reference)
 
