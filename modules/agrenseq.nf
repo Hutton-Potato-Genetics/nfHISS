@@ -60,7 +60,7 @@ process CreatePresenceMatrix {
     path 'presence_matrix.txt'
     script:
     """
-    create_presence_matrix.sh -i $accession_table -o presence_matrix.txt
+    create_presence_matrix.sh ${task.memory} -i $accession_table -o presence_matrix.txt
     """
 }
 
