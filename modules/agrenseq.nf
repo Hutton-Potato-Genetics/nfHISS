@@ -143,7 +143,7 @@ process GetSizes {
 }
 
 process Plot {
-    container 'https://hub.docker.com/r/rocker/tidyverse/'
+    container 'docker://rocker/tidyverse:4.4.1'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
