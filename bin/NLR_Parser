@@ -1,6 +1,0 @@
-#!/bin/bash
-java \
-    -jar /usr/local/bin/NLR-Parser3.jar \
-    -y "$(which mast)" \
-    -x /usr/local/bin/meme.xml \
-    "$@"
