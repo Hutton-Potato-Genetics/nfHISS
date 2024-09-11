@@ -380,6 +380,26 @@ process CombineGeneCoverages {
     """
 }
 
+process CombineCoverageValues {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path coverage_values
+    path reference_headers
+    val ulimit
+    output:
+    path 'all_coverage_values.txt'
+    script:
+    """
+    ulimit -n $ulimit
+    paste $reference_headers $coverage_values > all_coverage_values.txt
+    """
+}
+
 process CoverageMatrix{
     //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
     cpus 1
