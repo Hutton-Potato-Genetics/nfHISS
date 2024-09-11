@@ -311,6 +311,7 @@ process BaitBlastCheck {
 
 process BedtoolsCoverage {
     container 'docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_2'
+    scratch true
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
@@ -331,6 +332,35 @@ process BedtoolsCoverage {
     """
 }
 
+process PerGeneCoverage {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path reference_headers
+    tuple val(sample), path(coverage)
+    output:
+    tuple val(sample), path('gene_coverage.txt')
+    script:
+    """
+    cat $reference_headers | tail -n +2 | while read gene
+    do
+        numPosWithCoverage=`grep -w "\$gene" $coverage | awk '\$6>0' | wc -l`
+        numPosTotal=`grep -w "\$gene" $coverage | wc -l` 
+        if [ \$numPosTotal -eq 0 ]
+        then
+            echo "ERROR: gene \$gene has CDS region of length zero. Check your input data (e.g. gene spelling in FASTA and CDS BED file) and retry.\nAborting pipeline run."
+            exit 1
+        fi
+        pctCov=`awk "BEGIN {{print (\$numPosWithCoverage/\$numPosTotal)*100 }}"`
+        echo -e "\n# covered positions for sample $sample in gene \$gene: \$numPosWithCoverage\n# CDS positions for gene \$gene: \$numPosTotal\npctCov: \$pctCov"
+        echo -e "\$gene\t\$pctCov" > gene_coverage.txt
+    done
+    """
+}
 
 process CoverageMatrix{
     //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
