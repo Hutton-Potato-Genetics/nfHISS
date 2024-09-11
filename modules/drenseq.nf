@@ -260,7 +260,7 @@ process BaitBlastCheck {
     maxRetries 3
     time '1h'
     input:
-    path bait_regions_bed
+    path nlr_bait_regions_bed
     path reference_headers
     output:
     path 'passed_genes.txt'
@@ -272,7 +272,7 @@ process BaitBlastCheck {
 
     bed_nlr = set()
 
-    with open($bait_regions_bed) as bed:
+    with open($nlr_bait_regions_bed) as bed:
         for line in bed
             bed_nlr.add(line.strip().split()[3])
     
@@ -411,22 +411,39 @@ workflow drenseq {
         .fromPath(params.reference) \
         | BowtieBuild
 
-    bed = TrimBed(file(params.bed))
+    trimmed_bed = TrimBed(file(params.bed))
 
     reads = Channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
         .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) } \
-        | Fastp
+        | TrimReads
 
-    (bam, bai) = BowtieAlign(bowtie2_index.first(), reads)
+    sam = BowtieAlign(bowtie2_index.first(), reads, params.score, params.max_align)
 
-    (strict_bam, strict_bai) = StrictFilter(bam, bai)
+    (bam, bai) = ParseAlignment(sam)
 
-    BedtoolsCoverage(bed, strict_bam, strict_bai)
+    strict_bam = StrictFilter(bam, bai)
 
-    vcfs = FreeBayes(file(params.reference), fai, bed, bam, bai) \
-        | collect
+    strict_bai = IndexStrict(strict_bam)
 
-    MergeVCFs(vcfs, file(params.reference), bed)
+    blast_out = BaitsBlasting(params.reference, params.baits, params.identity, params.coverage)
+
+    (nlr_headers, reference_headers) = Headers(trimmed_bed, params.reference)
+
+    bait_regions_bed = IdentifyBaitRegions(blast_out, reference_headers, params.reference, params.flank)
+
+    nlr_bait_regions = AnnotatorBaits(bait_regions_bed, trimmed_bed)
+
+    (passed, missed) = BaitBlastCheck(nlr_bait_regions_bed, reference_headers)
+
+    coverage = BedtoolsCoverage(nlr_bait_regions_bed, strict_bam, strict_bai)
+
+    gene_coverage = PerGeneCoverage(reference_headers, coverage)
+
+    sample_coverage = CombineGeneCoverages(gene_coverage)
+
+    all_coverage_values = CombineCoverageValues(sample_coverage.collect(), reference_headers, params.ulimit)
+
+    transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
 }
