@@ -331,62 +331,6 @@ process BedtoolsCoverage {
     """
 }
 
-process FreeBayes {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
-    scratch true
-    cpus 1
-    memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '4h'
-    input:
-    path reference
-    path fai
-    path bed
-    path bam
-    path bai
-    output:
-    tuple path("${bam.baseName}.vcf.gz"), path("${bam.baseName}.vcf.gz.tbi")
-    script:
-    """
-    freebayes \
-      -f ${reference} \
-      -t ${bed} \
-      --min-alternate-count 2 \
-      --min-alternate-fraction 0.05 \
-      --ploidy 4 \
-      -m 0 \
-      -v variants.vcf \
-      --legacy-gls ${bam}
-
-    bcftools sort -o variants.sorted.vcf variants.vcf
-
-    bgzip -c variants.sorted.vcf > ${bam.baseName}.vcf.gz
-    tabix -p vcf ${bam.baseName}.vcf.gz
-    """
-}
-
-process MergeVCFs {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
-    cpus 1
-    memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '1h'
-    input:
-    path vcf_files
-    path reference
-    path bed
-    output:
-    path 'merged.vcf'
-    script:
-    """
-    VCF_FILES=\$(ls *.vcf.gz)
-    bcftools merge -o merged.vcf \$VCF_FILES
-    """
-}
 
 process CoverageMatrix{
     //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
