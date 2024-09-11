@@ -106,7 +106,7 @@ process RunAssociation {
 
 process Blast {
     container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
-    scratch false
+    scratch true
     cpus 8
     memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
@@ -116,13 +116,28 @@ process Blast {
     path blast_reference
     path association_reference
     output:
-    path 'blast_sorted.txt'
+    path 'blast.txt'
     script:
     """
     makeblastdb -in $blast_reference -dbtype nucl -out blast_ref
     blastn -query $association_reference -db blast_ref -outfmt 6 -num_threads $task.cpus > blast.txt
-    cat blast.txt | sort -k1,1 -k12,12nr -k11,11n > sorted_round_1.txt 
-    cat sorted_round_1.txt | sort -u -k1,1 -m > blast_sorted.txt
+    """
+}
+
+process SortBlast {
+    scratch true
+    cpus 1
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '8h'
+    input:
+    path blast_out
+    output:
+    path 'blast_sorted.txt'
+    script:
+    """
+    cat $blast_out | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 -m > blast_sorted.txt
     """
 }
 
