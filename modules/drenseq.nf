@@ -269,6 +269,46 @@ process AnnotatorBaits {
     """
 }
 
+process BaitBlastCheck {
+    container 'docker://quay.io/biocontainers/python:3.12'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    path bait_regions_bed
+    path reference_headers
+    output:
+    path 'passed_genes.txt'
+    path 'missed_genes.txt'
+    publishDir 'results', mode: 'copy'
+    script:
+    """
+    #!/usr/bin/env python3
+
+    bed_nlr = set()
+
+    with open($bait_regions_bed) as bed:
+        for line in bed
+            bed_nlr.add(line.strip().split()[3])
+    
+    with open($reference_headers) as headers:
+        next(headers) # skip the header
+        for line in headers:
+            nlr = line.strip()
+            if nlr not in bed_nlr:
+                with open("missing_genes.txt", "w") as missed:
+                    string_to_write = nlr + " not found in bed file"
+                    print(string_to_write, file = missed)
+    
+    with open("passed_genes.txt", "w") as passed:
+        for nlr in bed_nlr:
+            print(nlr, file = passed)
+    """
+}
+
 process BedtoolsCoverage {
     //conda conda_env
     container 'swiftseal/drenseq:latest'
