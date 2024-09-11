@@ -43,24 +43,6 @@ process TrimReads {
     """
 }
 
-process SamtoolsFaidx {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
-    cpus 1
-    memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '1h'
-    input:
-    path reference
-    output:
-    path "${reference}.fai"
-    script:
-    """
-    samtools faidx $reference
-    """
-}
-
 process BowtieBuild {
     container 'docker://quay.io/biocontainers/bowtie2:2.5.4--h7071971_4'
     scratch true
@@ -430,8 +412,6 @@ workflow drenseq {
         | BowtieBuild
 
     bed = TrimBed(file(params.bed))
-
-    fai = SamtoolsFaidx(file(params.reference))
 
     reads = Channel
         .fromPath(params.reads)
