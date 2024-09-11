@@ -176,6 +176,7 @@ process Plot {
     output:
     path 'AgRenSeq_plot.png'
     path 'Blast_plot.png'
+    path 'filtered_contigs.txt'
     publishDir 'results', mode: 'copy'
     script:
     """
