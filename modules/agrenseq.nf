@@ -208,7 +208,9 @@ workflow agrenseq {
 
     association = RunAssociation(matrix, association_reference, phenotype_file, nlrparser)
 
-    blast_text = Blast(params.blast_reference, association_reference)
+    blast_raw = Blast(params.blast_reference, association_reference)
+
+    blast_text = SortBlast(blast_raw)
 
     sizes = GetSizes(params.blast_reference)
 
