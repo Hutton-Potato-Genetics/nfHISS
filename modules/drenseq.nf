@@ -362,6 +362,24 @@ process PerGeneCoverage {
     """
 }
 
+process CombineGeneCoverages {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '1h'
+    input:
+    tuple val(sample), path(gene_coverage)
+    output:
+    path "${sample}_coverage_values.txt"
+    script:
+    """
+    echo $sample > ${sample}_coverage_values.txt
+    cat $gene_coverage | cut -f2 >> ${sample}_coverage_values.txt
+    """
+}
+
 process CoverageMatrix{
     //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
     cpus 1
