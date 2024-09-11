@@ -160,6 +160,7 @@ process Plot {
     output:
     path 'AgRenSeq_plot.png'
     path 'Blast_plot.png'
+    publishDir 'results', mode: 'copy'
     script:
     """
     plot.R $association_results $threshold $title filtered_contigs.txt AgRenSeq_plot.png
