@@ -310,25 +310,24 @@ process BaitBlastCheck {
 }
 
 process BedtoolsCoverage {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_2'
     cpus 1
-    memory { 16.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
-    path bed
-    path bam
-    path bai
+    path bait_regions_bed
+    tuple val(sample), path(bam)
+    tuple val(sample), path(bai)
     output:
-    path "${bam.baseName}.coverage.txt"
+    tuple val(sample), path('coverage.txt')
     script:
     """
-    bedtools coverage \
-        -a $bed \
+    bedtools coverage -d \
+        -a $bait_regions_bed \
         -b $bam \
-        > ${bam.baseName}.coverage.txt
+        > coverage.txt
     """
 }
 
