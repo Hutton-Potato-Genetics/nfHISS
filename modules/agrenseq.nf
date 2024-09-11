@@ -2,10 +2,10 @@ process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
     cpus 8
-    memory { 4.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '10m'
     input:
     tuple val(sample), path(read1), path(read2)
     path adaptor_1
@@ -34,7 +34,7 @@ process CountKmers {
     memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     tuple val(sample), path(read1), path(read2)
     output:
@@ -42,8 +42,8 @@ process CountKmers {
     script:
     """
     cat $read1 $read2 > reads.fq.gz
-    kmc -k51 -m8 -t${task.cpus} reads.fq.gz kmc_output .
-    kmc_tools transform kmc_output -ci10 dump ${sample}.dump
+    kmc -k51 -m${task.memory} -t${task.cpus} reads.fq.gz kmc_output .
+    kmc_tools transform -t${task.cpus} kmc_output -ci10 dump ${sample}.dump
     """
 }
 
@@ -53,7 +53,7 @@ process CreatePresenceMatrix {
     memory { 32.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '168h'
+    time '1h'
     input:
     path accession_table
     output:
@@ -69,10 +69,10 @@ process NLRParser {
     conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
     scratch true
     cpus 4
-    memory { 4.GB * task.attempt }
+    memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '8h'
+    time '10m'
     input:
     path reference
     output:
@@ -85,11 +85,11 @@ process NLRParser {
 
 process RunAssociation {
     scratch true
-    cpus 1
-    memory { 16.GB * task.attempt }
+    cpus 2
+    memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '6h'
+    time '15m'
     input:
     path presence_matrix
     path reference
@@ -108,10 +108,10 @@ process Blast {
     container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
     scratch true
     cpus 8
-    memory { 4.GB * task.attempt }
+    memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '8h'
+    time '15m'
     input:
     path blast_reference
     path association_reference
@@ -127,10 +127,10 @@ process Blast {
 process SortBlast {
     scratch true
     cpus 1
-    memory { 4.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '8h'
+    time '10m'
     input:
     path blast_out
     output:
@@ -148,7 +148,7 @@ process GetSizes {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path blast_reference
     output:
@@ -166,7 +166,7 @@ process Plot {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '10m'
     input:
     path blast_text
     path sizes
