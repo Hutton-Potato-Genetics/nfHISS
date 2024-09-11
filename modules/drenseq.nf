@@ -283,7 +283,7 @@ process BaitBlastCheck {
     output:
     path 'passed_genes.txt'
     path 'missed_genes.txt'
-    publishDir 'results', mode: 'copy'
+    publishDir 'results/diagnostics', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -400,41 +400,27 @@ process CombineCoverageValues {
     """
 }
 
-process CoverageMatrix{
-    //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
+process TransposeCombinedCoverage {
+    container 'docker://quay.io/biocontainers/pandas:2.2.1'
+    scratch true
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
     input:
-    path txt
+    path all_coverage_values
     output:
-    path 'merged.csv'
+    path 'all_coverage_values_transposed.txt'
+    publishDir 'results', mode: 'copy'
     script:
     """
-    #!/usr/bin/env Rscript
-    # Could use data.table, but I'm lazy :-)
-    library(tidyverse)
+    #!/usr/bin/env python3
+    
+    import pandas as pd
 
-    EXTENSION <- ".coverage.txt"
-
-    # list all files in directory
-    files <- list.files(path = "coverage", pattern = EXTENSION, full.names = TRUE)
-
-    # read all files into a list, appending the sample name
-    merged <- files %>%
-      map(function(x) {
-        read.table(x) %>% mutate(sample = gsub(EXTENSION, "", basename(x)))
-      }) %>%
-      bind_rows() %>%
-      select(gene = V4, sample = sample, coverage = V8)
-
-    matrix <- merged %>%
-      pivot_wider(names_from = sample, values_from = coverage)
-
-    write_delim(merged, "coverage_long.tsv", delim = "\t", col_names = FALSE)
-    write_delim(matrix, "coverage_matrix.tsv", delim = "\t", col_names = TRUE)
+    df = pd.read_table($all_coverage_values, header = None)
+    df.T.to_csv("all_coverage_values_transposed.txt", sep = "\t", header = False, index = False)
     """
 }
 
