@@ -255,7 +255,7 @@ process BaitBlastCheck {
     bed_nlr = set()
 
     with open($nlr_bait_regions_bed) as bed:
-        for line in bed
+        for line in bed:
             bed_nlr.add(line.strip().split()[3])
     
     with open($reference_headers) as headers:
