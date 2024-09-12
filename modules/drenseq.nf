@@ -397,7 +397,7 @@ workflow drenseq {
     reads = Channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
-        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) }
+        .map { row -> tuple(row.sample, file(row.FRead), file(row.RRead)) }
     
     trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
 
