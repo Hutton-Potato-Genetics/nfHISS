@@ -194,7 +194,7 @@ process Headers {
 }
 
 process IdentifyBaitRegions {
-    container 'docker://rocker/tidyverse:4.4.1'
+    container 'docker://quay.io/biocontainers/bioconductor-biostrings:2.70.1--r43ha9d7317_2'
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
