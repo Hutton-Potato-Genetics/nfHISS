@@ -16,8 +16,6 @@ process TrimReads {
     """
     cutadapt \
         -j $task.cpus \
-        --minimum-length 50 \
-        -q 20,20 \
         -a file:$adaptor_1 \
         -A file:$adaptor_2 \
         -o R1.fastq.gz \
