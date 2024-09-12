@@ -306,13 +306,13 @@ process PerGeneCoverage {
     maxRetries 3
     time '1h'
     input:
-    path reference_headers
+    path nlr_headers
     tuple val(sample), path(coverage)
     output:
     tuple val(sample), path('gene_coverage.txt')
     script:
     """
-    cat $reference_headers | tail -n +2 | while read gene
+    cat $nlr_headers | tail -n +2 | while read gene
     do
         numPosWithCoverage=`grep -w "\$gene" $coverage | awk '\$6>0' | wc -l`
         numPosTotal=`grep -w "\$gene" $coverage | wc -l` 
@@ -422,7 +422,7 @@ workflow drenseq {
 
     coverage = BedtoolsCoverage(nlr_bait_regions_bed, strict_bam, passed)
 
-    gene_coverage = PerGeneCoverage(reference_headers, coverage)
+    gene_coverage = PerGeneCoverage(nlr_headers, coverage)
 
     sample_coverage = CombineGeneCoverages(gene_coverage)
 
