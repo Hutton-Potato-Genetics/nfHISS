@@ -416,10 +416,11 @@ workflow drenseq {
     reads = Channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
-        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) } \
-        | TrimReads
+        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) }
+    
+    trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
 
-    sam = BowtieAlign(bowtie2_index.first(), reads, params.score, params.max_align)
+    sam = BowtieAlign(bowtie2_index.first(), trimmed_reads, params.score, params.max_align)
 
     (bam, bai) = ParseAlignment(sam)
 
