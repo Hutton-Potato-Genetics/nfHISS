@@ -285,6 +285,7 @@ process BedtoolsCoverage {
     input:
     path bait_regions_bed
     tuple val(sample), path(bam)
+    path passed_genes
     output:
     tuple val(sample), path('coverage.txt')
     script:
@@ -418,7 +419,7 @@ workflow drenseq {
 
     (passed, missed) = BaitBlastCheck(nlr_bait_regions_bed, reference_headers)
 
-    coverage = BedtoolsCoverage(nlr_bait_regions_bed, strict_bam)
+    coverage = BedtoolsCoverage(nlr_bait_regions_bed, strict_bam, passed)
 
     gene_coverage = PerGeneCoverage(reference_headers, coverage)
 
