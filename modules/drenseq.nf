@@ -167,7 +167,7 @@ process BaitsBlasting {
         -out blast_out.txt \
         -perc_identity $identity \
         -qcov_hsp_perc $coverage \
-        -e-value 1e-5 \
+        -evalue 1e-5 \
         -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen len qcovs qcovhsp'
     """
 }
