@@ -355,14 +355,14 @@ process CombineCoverageValues {
     time '1h'
     input:
     path coverage_values
-    path reference_headers
+    path nlr_headers
     val ulimit
     output:
     path 'all_coverage_values.txt'
     script:
     """
     ulimit -n $ulimit
-    paste $reference_headers $coverage_values > all_coverage_values.txt
+    paste $nlr_headers $coverage_values > all_coverage_values.txt
     """
 }
 
@@ -426,7 +426,7 @@ workflow drenseq {
 
     sample_coverage = CombineGeneCoverages(gene_coverage)
 
-    all_coverage_values = CombineCoverageValues(sample_coverage.collect(), reference_headers, params.ulimit)
+    all_coverage_values = CombineCoverageValues(sample_coverage.collect(), nlr_headers, params.ulimit)
 
     transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
 }
