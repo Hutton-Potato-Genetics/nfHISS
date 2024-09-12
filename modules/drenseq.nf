@@ -261,11 +261,12 @@ process BaitBlastCheck {
     with open("$reference_headers") as headers:
         next(headers) # skip the header
         for line in headers:
-            nlr = line.strip()
-            if nlr not in bed_nlr:
-                with open("missing_genes.txt", "w") as missed:
+            with open("missing_genes.txt", "w") as missed:
+                nlr = line.strip()
+                if nlr not in bed_nlr:
                     string_to_write = nlr + " not found in bed file"
                     print(string_to_write, file = missed)
+                print("\n", file = missed)
     
     with open("passed_genes.txt", "w") as passed:
         for nlr in bed_nlr:
