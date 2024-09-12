@@ -41,8 +41,9 @@ process CountKmers {
     tuple val(sample), path("${sample}.dump")
     script:
     """
+    memory=\$(echo ${task.memory} | sed 's/ GB//g')
     cat $read1 $read2 > reads.fq.gz
-    kmc -k51 -m${task.memory} -t${task.cpus} reads.fq.gz kmc_output .
+    kmc -k51 -m\$memory -t${task.cpus} reads.fq.gz kmc_output .
     kmc_tools -t${task.cpus} transform kmc_output -ci10 dump ${sample}.dump
     """
 }
