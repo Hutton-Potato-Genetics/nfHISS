@@ -266,7 +266,8 @@ process BaitBlastCheck {
                 if nlr not in bed_nlr:
                     string_to_write = nlr + " not found in bed file"
                     print(string_to_write, file = missed)
-                print("\\n", file = missed)
+        with open("missing_genes.txt", "w") as missed:
+            print("End of file", file = missed)
     
     with open("passed_genes.txt", "w") as passed:
         for nlr in bed_nlr:
