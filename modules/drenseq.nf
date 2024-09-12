@@ -385,7 +385,7 @@ process TransposeCombinedCoverage {
     
     import pandas as pd
 
-    df = pd.read_table($all_coverage_values, header = None)
+    df = pd.read_table("$all_coverage_values", header = None)
     df.T.to_csv("all_coverage_values_transposed.txt", sep = "\t", header = False, index = False)
     """
 }
