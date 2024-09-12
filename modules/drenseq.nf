@@ -414,7 +414,7 @@ workflow drenseq {
 
     bait_regions_bed = IdentifyBaitRegions(blast_out, reference_headers, params.reference, params.flank)
 
-    nlr_bait_regions = AnnotatorBaits(bait_regions_bed, trimmed_bed)
+    nlr_bait_regions_bed = AnnotatorBaits(bait_regions_bed, trimmed_bed)
 
     (passed, missed) = BaitBlastCheck(nlr_bait_regions_bed, reference_headers)
 
