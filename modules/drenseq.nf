@@ -323,7 +323,7 @@ process PerGeneCoverage {
         fi
         pctCov=`awk "BEGIN {{print (\$numPosWithCoverage/\$numPosTotal)*100 }}"`
         echo -e "\n# covered positions for sample $sample in gene \$gene: \$numPosWithCoverage\n# CDS positions for gene \$gene: \$numPosTotal\npctCov: \$pctCov"
-        echo -e "\$gene\t\$pctCov" > gene_coverage.txt
+        echo -e "\$gene\t\$pctCov" >> gene_coverage.txt
     done
     """
 }
