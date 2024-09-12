@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar "$(dirname "$0")/AgRenSeq_RunAssociation.jar" "$@"
+java -jar -Xmx$1 "$(dirname "$0")/AgRenSeq_RunAssociation.jar" "${@:2}"

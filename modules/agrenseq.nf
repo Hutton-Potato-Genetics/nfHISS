@@ -101,7 +101,8 @@ process RunAssociation {
     publishDir 'results', mode: 'copy'
     script:
     """
-    run_association.sh -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
+    memory=\$(echo ${task.memory} | sed 's/ //g' | sed 's/B//g')
+    run_association.sh \$memory -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
     """
 }
 
