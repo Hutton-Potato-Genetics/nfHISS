@@ -39,9 +39,8 @@ process CountKmers {
     tuple val(sample), path("${sample}.dump")
     script:
     """
-    memory=\$(echo ${task.memory} | sed 's/ GB//g')
     cat $read1 $read2 > reads.fq.gz
-    kmc -k51 -m\$memory -t${task.cpus} reads.fq.gz kmc_output .
+    kmc -k51 -m${task.memory.toGiga()} -t${task.cpus} reads.fq.gz kmc_output .
     kmc_tools -t${task.cpus} transform kmc_output -ci10 dump ${sample}.dump
     """
 }
@@ -59,8 +58,7 @@ process CreatePresenceMatrix {
     path 'presence_matrix.txt'
     script:
     """
-    memory=\$(echo ${task.memory} | sed 's/ //g' | sed 's/B//g')
-    create_presence_matrix.sh \$memory -i $accession_table -o presence_matrix.txt
+    create_presence_matrix.sh ${task.memory.toGiga()}G -i $accession_table -o presence_matrix.txt
     """
 }
 
@@ -99,8 +97,7 @@ process RunAssociation {
     publishDir 'results', mode: 'copy'
     script:
     """
-    memory=\$(echo ${task.memory} | sed 's/ //g' | sed 's/B//g')
-    run_association.sh \$memory -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
+    run_association.sh ${task.memory.toGiga()}G -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
     """
 }
 
