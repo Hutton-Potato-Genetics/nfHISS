@@ -3,7 +3,7 @@ process TrimBed {
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    time '1h'
+    time '10m'
     input:
     path bed
     output:
@@ -21,7 +21,7 @@ process TrimReads {
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '10m'
     input:
     tuple val(sample), path(read1), path(read2)
     path adaptor_1
@@ -50,7 +50,7 @@ process BowtieBuild {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path reference
     output:
@@ -69,7 +69,7 @@ process BowtieAlign {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '6h'
+    time '10m'
     input:
     path bowtie2_index
     tuple val(sample), path(read1), path(read2)
@@ -105,7 +105,7 @@ process ParseAlignment {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     tuple val(sample), path(sam)
     output:
@@ -126,7 +126,7 @@ process StrictFilter {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '10m'
     input:
     tuple val(sample), path(bam)
     tuple val(sample), path(bai)
@@ -151,7 +151,7 @@ process BaitsBlasting {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '8h'
+    time '10m'
     input:
     path reference
     path baits
@@ -180,7 +180,7 @@ process Headers {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path trimmed_bed
     path reference
@@ -202,7 +202,7 @@ process IdentifyBaitRegions {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '10m'
     input:
     path blast_out
     path reference_headers
@@ -223,7 +223,7 @@ process AnnotatorBaits {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '10m'
     input:
     path bait_regions
     path trimmed_bed
@@ -242,7 +242,7 @@ process BaitBlastCheck {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path nlr_bait_regions_bed
     path reference_headers
@@ -284,7 +284,7 @@ process BedtoolsCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path bait_regions_bed
     tuple val(sample), path(bam)
@@ -306,7 +306,7 @@ process PerGeneCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path nlr_headers
     tuple val(sample), path(coverage)
@@ -336,7 +336,7 @@ process CombineGeneCoverages {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     tuple val(sample), path(gene_coverage)
     output:
@@ -354,7 +354,7 @@ process CombineCoverageValues {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path coverage_values
     path nlr_headers
@@ -375,7 +375,7 @@ process TransposeCombinedCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path all_coverage_values
     output:
