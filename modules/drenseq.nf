@@ -169,6 +169,7 @@ process BaitsBlasting {
         -perc_identity $identity \
         -qcov_hsp_perc $coverage \
         -evalue 1e-5 \
+        -num_threads $task.cpus
         -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen len qcovs qcovhsp'
     """
 }
