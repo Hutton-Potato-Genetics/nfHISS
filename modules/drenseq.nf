@@ -122,7 +122,7 @@ process ParseAlignment {
 process StrictFilter {
     container 'docker://quay.io/biocontainers/sambamba:1.0.1--h6f6fda4_2'
     scratch true
-    cpus 1
+    cpus 2
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
@@ -139,6 +139,7 @@ process StrictFilter {
         -l 9 \
         --filter='[NM] == 0' \
         -o strict.bam \
+        -t 2 \
         $bam
     """   
 }
