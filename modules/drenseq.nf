@@ -18,7 +18,7 @@ process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
     cpus 8
-    memory { 4.GB * task.attempt }
+    memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '4h'
@@ -102,7 +102,7 @@ process ParseAlignment {
     container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
     scratch true
     cpus 2
-    memory { 2.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '1h'
@@ -148,7 +148,7 @@ process BaitsBlasting {
     container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
     scratch true
     cpus 8
-    memory { 4.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
     time '8h'
