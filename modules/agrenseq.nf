@@ -182,6 +182,29 @@ process Plot {
     """
 }
 
+process FinalFilePrep {
+    scratch true
+    cpus 1
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    maxRetries 3
+    time { 15.m * task.attempt }
+    input:
+    path association_reference
+    path annotator_bed
+    path filtered_contigs
+    output:
+    path 'candidates.fa'
+    path 'candidates.bed'
+    publishDir 'results', mode: 'copy'
+    script:
+    """
+    awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' < $association_reference | tail -n +2 > unwrapped.fa
+    cat unwrapped.fa | grep -A1 -f $filtered_contigs | sed 's/--//g' | sed '/^$/d' | sed '/^>/ s/ .*//' > candidates.fa
+    cat $annotator_bed | grep -f $filtered_contigs | cut -f1-4 > candidates.bed
+    """
+}
+
 workflow agrenseq {
     reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.R1), file(row.R2)) }
 
@@ -212,5 +235,7 @@ workflow agrenseq {
 
     sizes = GetSizes(params.blast_reference)
 
-    (ag_plot, blast_plot) = Plot(blast_text, sizes, association, params.threshold, params.title)
+    (ag_plot, blast_plot, filtered_contigs) = Plot(blast_text, sizes, association, params.threshold, params.title)
+
+    (candidates_fa, candidates_bed) = FinalFilePrep(association_reference, params.bed, filtered_contigs)
 }
