@@ -6,6 +6,7 @@ help_message = """
 Needin' some help? ------------------------------------------------------------
 
 There are currently three workflows available in this pipeline:
+- smrtrenseq: for assembling HiFi RenSeq reads into contigs
 - agrenseq: for carrying out association analysis from renseq data
 - drenseq: for calculating read coverage of known resistance genes
 
@@ -13,15 +14,35 @@ agrenseq ----------------------------------------------------------------------
 
 Usage:
     nextflow run Hutton-Potato-Genetics/nfHISS --workflow agrenseq \
-                                               --reference <reference> \
+                                               --association_reference <association_reference> \
                                                --reads <read_scores> \
-                                               <other options>
+                                               --adaptor_1 <barcode_fasta_1> \
+                                               --adaptor_2 <barcode_fasta_2> \
+                                               --blast_reference <blast_reference> \
+                                               --threshold <association_threshold> \
+                                               --title <plot_title>
+
+
 
 Options:
-    --reference <reference>    Path to the reference fasta
-    --reads <read_scores>      Path to the reads file - tab-separated file
-                               with columns 'sample', 'forward', 'reverse',
-                               and 'score'
+    --association_reference <association_reference>     Path to the association
+                                                        reference fasta
+    --reads <read_scores>                               Path to the reads file 
+                                                        - tab-separated file
+                                                        with columns 'sample'
+                                                        'forward', 'reverse',
+                                                        and 'score'
+    --adaptor_1 <barcode_fasta_1>                       Path to first barcode
+                                                        fasta
+    --adaptor_2 <barcode_fasta_2>                       Path to second barcode
+                                                        fasta
+    --blast_reference <blast_reference>                 Path to the blast
+                                                        reference fasta
+    --threshold <association_threshold>                 Value to use as
+                                                        significance threshold
+                                                        in the association plot
+    --title <plot_title>                                Title for association
+                                                        plot
 
 drenseq -----------------------------------------------------------------------
 
