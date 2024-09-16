@@ -1,19 +1,9 @@
-//conda_env = """
-//bioconda::fastp=0.23.4
-//bioconda::freebayes=1.3.7
-//bioconda::sambamba=1.0
-//bioconda::samtools=1.19.2
-//bioconda::bcftools=1.19
-//bioconda::bowtie2=2.5.3
-//bioconda::htslib=1.19.1
-//bioconda::bedtools=2.31.1
-//"""
-
-// Trim the bed file to an expected size
 process TrimBed {
+    scratch true
     cpus 1
-    memory '1 GB'
-    time '1h'
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    time '10m'
     input:
     path bed
     output:
@@ -24,51 +14,43 @@ process TrimBed {
     """
 }
 
-process Fastp {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+process TrimReads {
+    container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
-    cpus 1
-    memory { 4.GB * task.attempt }
+    cpus 8
+    memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '10m'
     input:
     tuple val(sample), path(read1), path(read2)
+    path adaptor_1
+    path adaptor_2
     output:
     tuple val(sample), path('R1.fastq.gz'), path('R2.fastq.gz')
     script:
     """
-    fastp -i $read1 -I $read2 -o R1.fastq.gz -O R2.fastq.gz
-    """
-}
-
-process SamtoolsFaidx {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
-    cpus 1
-    memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '1h'
-    input:
-    path reference
-    output:
-    path "${reference}.fai"
-    script:
-    """
-    samtools faidx $reference
+    cutadapt \
+        -j $task.cpus \
+        --minimum-length 50 \
+        -q 20,20 \
+        -a file:$adaptor_1 \
+        -A file:$adaptor_2 \
+        -o R1.fastq.gz \
+        -p R2.fastq.gz \
+        $read1 \
+        $read2
     """
 }
 
 process BowtieBuild {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/bowtie2:2.5.4--h7071971_4'
+    scratch true
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
     path reference
     output:
@@ -81,20 +63,20 @@ process BowtieBuild {
 }
 
 process BowtieAlign {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/bowtie2:2.5.4--h7071971_4'
     scratch true
     cpus 8
-    memory { 8.GB * task.attempt }
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '6h'
+    time '10m'
     input:
     path bowtie2_index
     tuple val(sample), path(read1), path(read2)
+    val score
+    val max_align
     output:
-    path "${sample}.bam"
-    path "${sample}.bam.bai"
+    tuple val(sample), path('aligned.sam')
     script:
     """
     bowtie2 \
@@ -104,162 +86,309 @@ process BowtieAlign {
       --rg-id $sample \
       --rg SM:${sample} \
       -p ${task.cpus} \
-      --score-min L,0,-0.24 \
+      --score-min $score \
       --phred33 \
       --fr \
       --maxins 1000 \
       --very-sensitive \
       --no-unal \
       --no-discordant \
-      -k 10 \
-      | samtools sort -@ ${task.cpus} -o ${sample}.bam
+      -k $max_align \
+      -S aligned.sam
+    """
+}
 
-    samtools index ${sample}.bam
+process ParseAlignment {
+    container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
+    scratch true
+    cpus 2
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    tuple val(sample), path(sam)
+    output:
+    tuple val(sample), path('aligned.bam')
+    tuple val(sample), path('aligned.bam.bai')
+    script:
+    """
+    samtools view $sam -b -o aligned_unsorted.bam -@ $task.cpus
+    samtools sort -l 9 $sam -o aligned.bam -@ $task.cpus
+    samtools index aligned.bam aligned.bam.bai -@ $task.cpus
     """
 }
 
 process StrictFilter {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+    container 'docker://quay.io/biocontainers/sambamba:1.0.1--h6f6fda4_2'
     scratch true
-    cpus 1
+    cpus 2
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '2h'
+    time '10m'
     input:
-    path bam
-    path bai
+    tuple val(sample), path(bam)
+    tuple val(sample), path(bai)
     output:
-    path "${bam.baseName}.strict.bam"
-    path "${bam.baseName}.strict.bam.bai"
+    tuple val(sample), path('strict.bam')
     script:
     """    
     sambamba view \
         --format=bam \
+        -l 9 \
         --filter='[NM] == 0' \
-        $bam \
-        > ${bam.baseName}.strict.bam
-
-    samtools index ${bam.baseName}.strict.bam
+        -o strict.bam \
+        -t 2 \
+        $bam
     """   
 }
 
-process BedtoolsCoverage {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
-    cpus 1
-    memory { 16.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '1h'
-    input:
-    path bed
-    path bam
-    path bai
-    output:
-    path "${bam.baseName}.coverage.txt"
-    script:
-    """
-    bedtools coverage \
-        -a $bed \
-        -b $bam \
-        > ${bam.baseName}.coverage.txt
-    """
-}
-
-process FreeBayes {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
+process BaitsBlasting {
+    container 'docker://quay.io/biocontainers/blast:2.16.0--hc155240_2'
     scratch true
-    cpus 1
-    memory { 4.GB * task.attempt }
+    cpus 8
+    memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '4h'
+    time '10m'
     input:
     path reference
-    path fai
-    path bed
-    path bam
-    path bai
+    path baits
+    val identity
+    val coverage
     output:
-    tuple path("${bam.baseName}.vcf.gz"), path("${bam.baseName}.vcf.gz.tbi")
+    path 'blast_out.txt'
     script:
     """
-    freebayes \
-      -f ${reference} \
-      -t ${bed} \
-      --min-alternate-count 2 \
-      --min-alternate-fraction 0.05 \
-      --ploidy 4 \
-      -m 0 \
-      -v variants.vcf \
-      --legacy-gls ${bam}
-
-    bcftools sort -o variants.sorted.vcf variants.vcf
-
-    bgzip -c variants.sorted.vcf > ${bam.baseName}.vcf.gz
-    tabix -p vcf ${bam.baseName}.vcf.gz
+    makeblastdb -in $reference -out blast_db -dbtype nucl
+    blastn \
+        -db blast_db \
+        -query $baits \
+        -out blast_out.txt \
+        -perc_identity $identity \
+        -qcov_hsp_perc $coverage \
+        -evalue 1e-5 \
+        -num_threads $task.cpus \
+        -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen len qcovs qcovhsp'
     """
 }
 
-process MergeVCFs {
-    //conda conda_env
-    container 'swiftseal/drenseq:latest'
-    cpus 1
-    memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 3
-    time '1h'
-    input:
-    path vcf_files
-    path reference
-    path bed
-    output:
-    path 'merged.vcf'
-    script:
-    """
-    VCF_FILES=\$(ls *.vcf.gz)
-    bcftools merge -o merged.vcf \$VCF_FILES
-    """
-}
-
-process CoverageMatrix{
-    //container 'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1'
+process Headers {
+    scratch true
     cpus 1
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 3
-    time '1h'
+    time '10m'
     input:
-    path txt
+    path trimmed_bed
+    path reference
     output:
-    path 'merged.csv'
+    path 'nlr_headers.txt'
+    path 'reference_headers.txt'
     script:
     """
-    #!/usr/bin/env Rscript
-    # Could use data.table, but I'm lazy :-)
-    library(tidyverse)
+    echo "gene" > nlr_headers.txt
+    cat $trimmed_bed | cut -f4 >> nlr_headers.txt
+    cat $reference | grep '>' | sed 's/>//g' > reference_headers.txt
+    """
+}
 
-    EXTENSION <- ".coverage.txt"
+process IdentifyBaitRegions {
+    container 'docker://quay.io/biocontainers/bioconductor-biostrings:2.70.1--r43ha9d7317_2'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path blast_out
+    path reference_headers
+    path reference
+    val flank
+    output:
+    path 'bait_regions.bed'
+    script:
+    """
+    RangeReduction.R $blast_out bait_regions.bed $flank $reference_headers $reference
+    """
+}
 
-    # list all files in directory
-    files <- list.files(path = "coverage", pattern = EXTENSION, full.names = TRUE)
+process AnnotatorBaits {
+    container 'docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_2'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path bait_regions
+    path trimmed_bed
+    output:
+    path 'nlr_bait_regions.bed'
+    script:
+    """
+    bedtools intersect -a $trimmed_bed -b $bait_regions > nlr_bait_regions.bed
+    """
+}
 
-    # read all files into a list, appending the sample name
-    merged <- files %>%
-      map(function(x) {
-        read.table(x) %>% mutate(sample = gsub(EXTENSION, "", basename(x)))
-      }) %>%
-      bind_rows() %>%
-      select(gene = V4, sample = sample, coverage = V8)
+process BaitBlastCheck {
+    container 'docker://quay.io/biocontainers/python:3.12'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path nlr_bait_regions_bed
+    path reference_headers
+    output:
+    path 'passed_genes.txt'
+    path 'missing_genes.txt'
+    publishDir 'results/diagnostics', mode: 'copy'
+    script:
+    """
+    #!/usr/bin/env python3
 
-    matrix <- merged %>%
-      pivot_wider(names_from = sample, values_from = coverage)
+    bed_nlr = set()
 
-    write_delim(merged, "coverage_long.tsv", delim = "\t", col_names = FALSE)
-    write_delim(matrix, "coverage_matrix.tsv", delim = "\t", col_names = TRUE)
+    with open("$nlr_bait_regions_bed") as bed:
+        for line in bed:
+            bed_nlr.add(line.strip().split()[3])
+    
+    with open("$reference_headers") as headers:
+        next(headers) # skip the header
+        for line in headers:
+            with open("missing_genes.txt", "w") as missed:
+                nlr = line.strip()
+                if nlr not in bed_nlr:
+                    string_to_write = nlr + " not found in bed file"
+                    print(string_to_write, file = missed)
+        with open("missing_genes.txt", "w") as missed:
+            print("\\n", file = missed)
+    
+    with open("passed_genes.txt", "w") as passed:
+        for nlr in bed_nlr:
+            print(nlr, file = passed)
+    """
+}
+
+process BedtoolsCoverage {
+    container 'docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_2'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path bait_regions_bed
+    tuple val(sample), path(bam)
+    path passed_genes
+    output:
+    tuple val(sample), path('coverage.txt')
+    script:
+    """
+    bedtools coverage -d \
+        -a $bait_regions_bed \
+        -b $bam \
+        > coverage.txt
+    """
+}
+
+process PerGeneCoverage {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path nlr_headers
+    tuple val(sample), path(coverage)
+    output:
+    tuple val(sample), path('gene_coverage.txt')
+    script:
+    """
+    cat $nlr_headers | tail -n +2 | while read gene
+    do
+        numPosWithCoverage=`grep -w "\$gene" $coverage | awk '\$6>0' | wc -l`
+        numPosTotal=`grep -w "\$gene" $coverage | wc -l` 
+        if [ \$numPosTotal -eq 0 ]
+        then
+            echo "ERROR: gene \$gene has CDS region of length zero. Check your input data (e.g. gene spelling in FASTA and CDS BED file) and retry.\nAborting pipeline run."
+            exit 1
+        fi
+        pctCov=`awk "BEGIN {{print (\$numPosWithCoverage/\$numPosTotal)*100 }}"`
+        echo -e "\n# covered positions for sample $sample in gene \$gene: \$numPosWithCoverage\n# CDS positions for gene \$gene: \$numPosTotal\npctCov: \$pctCov"
+        echo -e "\$gene\t\$pctCov" >> gene_coverage.txt
+    done
+    """
+}
+
+process CombineGeneCoverages {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    tuple val(sample), path(gene_coverage)
+    output:
+    path "${sample}_coverage_values.txt"
+    script:
+    """
+    echo $sample > ${sample}_coverage_values.txt
+    cat $gene_coverage | cut -f2 >> ${sample}_coverage_values.txt
+    """
+}
+
+process CombineCoverageValues {
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path coverage_values
+    path nlr_headers
+    val ulimit
+    output:
+    path 'all_coverage_values.txt'
+    script:
+    """
+    ulimit -n $ulimit
+    paste $nlr_headers $coverage_values > all_coverage_values.txt
+    """
+}
+
+process TransposeCombinedCoverage {
+    container 'docker://quay.io/biocontainers/pandas:2.2.1'
+    scratch true
+    cpus 1
+    memory { 1.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 3
+    time '10m'
+    input:
+    path all_coverage_values
+    output:
+    path 'all_coverage_values_transposed.txt'
+    publishDir 'results', mode: 'copy'
+    script:
+    """
+    #!/usr/bin/env python3
+    
+    import pandas as pd
+
+    df = pd.read_table("$all_coverage_values", header = None)
+    df.T.to_csv("all_coverage_values_transposed.txt", sep = "\t", header = False, index = False)
     """
 }
 
@@ -268,24 +397,38 @@ workflow drenseq {
         .fromPath(params.reference) \
         | BowtieBuild
 
-    bed = TrimBed(file(params.bed))
-
-    fai = SamtoolsFaidx(file(params.reference))
+    trimmed_bed = TrimBed(file(params.bed))
 
     reads = Channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
-        .map { row -> tuple(row.sample, file(row.forward), file(row.reverse)) } \
-        | Fastp
+        .map { row -> tuple(row.sample, file(row.FRead), file(row.RRead)) }
+    
+    trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
 
-    (bam, bai) = BowtieAlign(bowtie2_index.first(), reads)
+    sam = BowtieAlign(bowtie2_index.first(), trimmed_reads, params.score, params.max_align)
 
-    (strict_bam, strict_bai) = StrictFilter(bam, bai)
+    (bam, bai) = ParseAlignment(sam)
 
-    BedtoolsCoverage(bed, strict_bam, strict_bai)
+    strict_bam = StrictFilter(bam, bai)
 
-    vcfs = FreeBayes(file(params.reference), fai, bed, bam, bai) \
-        | collect
+    blast_out = BaitsBlasting(params.reference, params.baits, params.identity, params.coverage)
 
-    MergeVCFs(vcfs, file(params.reference), bed)
+    (nlr_headers, reference_headers) = Headers(trimmed_bed, params.reference)
+
+    bait_regions_bed = IdentifyBaitRegions(blast_out, reference_headers, params.reference, params.flank)
+
+    nlr_bait_regions_bed = AnnotatorBaits(bait_regions_bed, trimmed_bed)
+
+    (passed, missed) = BaitBlastCheck(nlr_bait_regions_bed, reference_headers)
+
+    coverage = BedtoolsCoverage(nlr_bait_regions_bed, strict_bam, passed)
+
+    gene_coverage = PerGeneCoverage(nlr_headers, coverage)
+
+    sample_coverage = CombineGeneCoverages(gene_coverage)
+
+    all_coverage_values = CombineCoverageValues(sample_coverage.collect(), nlr_headers, params.ulimit)
+
+    transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
 }
