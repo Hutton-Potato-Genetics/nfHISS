@@ -43,6 +43,9 @@ Options:
                                                         in the association plot
     --title <plot_title>                                Title for association
                                                         plot
+    --annotator_bed <bed_file_of_nlrs>                  Bed file of NLR
+                                                        locations used to
+                                                        identify candidate NLRs
 
 drenseq -----------------------------------------------------------------------
 
