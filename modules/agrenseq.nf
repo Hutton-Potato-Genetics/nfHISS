@@ -3,9 +3,9 @@ process TrimReads {
     scratch true
     cpus 8
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '10m'
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(read1), path(read2)
     path adaptor_1
@@ -30,9 +30,9 @@ process CountKmers {
     scratch true
     cpus 2
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '10m'
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(read1), path(read2)
     output:
@@ -49,9 +49,9 @@ process CreatePresenceMatrix {
     scratch true
     cpus 1
     memory { 32.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '1h'
+    time { 1.h * task.attempt }
     input:
     path accession_table
     output:
@@ -67,9 +67,9 @@ process NLRParser {
     scratch true
     cpus 4
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '10m'
+    time { 10.m * task.attempt }
     input:
     path reference
     output:
@@ -84,9 +84,9 @@ process RunAssociation {
     scratch true
     cpus 2
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     path presence_matrix
     path reference
@@ -106,9 +106,9 @@ process Blast {
     scratch true
     cpus 8
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     path blast_reference
     path association_reference
@@ -125,9 +125,9 @@ process SortBlast {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '10m'
+    time { 10.m * task.attempt }
     input:
     path blast_out
     output:
@@ -143,9 +143,9 @@ process GetSizes {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '10m'
+    time { 10.m * task.attempt }
     input:
     path blast_reference
     output:
@@ -161,9 +161,9 @@ process Plot {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '10m'
+    time { 10.m * task.attempt }
     input:
     path blast_text
     path sizes
@@ -179,6 +179,29 @@ process Plot {
     """
     plot.R $association_results $threshold $title filtered_contigs.txt AgRenSeq_plot.png
     blast_plot.R $sizes $blast_text filtered_contigs.txt $title Blast_plot.png
+    """
+}
+
+process FinalFilePrep {
+    scratch true
+    cpus 1
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    maxRetries 3
+    time { 15.m * task.attempt }
+    input:
+    path association_reference
+    path annotator_bed
+    path filtered_contigs
+    output:
+    path 'candidates.fa'
+    path 'candidates.bed'
+    publishDir 'results', mode: 'copy'
+    script:
+    """
+    awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' < $association_reference | tail -n +2 > unwrapped.fa
+    cat unwrapped.fa | grep -A1 -f $filtered_contigs | sed 's/--//g' | sed '/^$/d' | sed '/^>/ s/ .*//' > candidates.fa
+    cat $annotator_bed | grep -f $filtered_contigs | cut -f1-4 > candidates.bed
     """
 }
 
@@ -212,5 +235,7 @@ workflow agrenseq {
 
     sizes = GetSizes(params.blast_reference)
 
-    (ag_plot, blast_plot) = Plot(blast_text, sizes, association, params.threshold, params.title)
+    (ag_plot, blast_plot, filtered_contigs) = Plot(blast_text, sizes, association, params.threshold, params.title)
+
+    (candidates_fa, candidates_bed) = FinalFilePrep(association_reference, params.bed, filtered_contigs)
 }

@@ -3,9 +3,9 @@ process TrimReads {
     scratch true
     cpus 8
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(reads)
     val five_prime
@@ -24,9 +24,9 @@ process CanuAssemble {
     scratch true
     cpus 8
     memory { 36.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '4h'
+    time { 4.h * task.attempt }
     input:
     tuple val(sample), path(reads)
     val genome_size
@@ -44,7 +44,7 @@ process CanuAssemble {
         useGrid=false \
         -pacbio-hifi $reads \
         maxInputCoverage=$max_input_coverage \
-        batMemory=32g
+        batMemory=${task.memory.toGiga()}g
     """
 }
 
@@ -53,9 +53,9 @@ process SeqkitStats {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
@@ -72,9 +72,9 @@ process ChopSequences {
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
@@ -90,9 +90,9 @@ process NLRParser {
     scratch true
     cpus 2
     memory { 3.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
@@ -108,9 +108,9 @@ process NLRAnnotator {
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
@@ -129,9 +129,9 @@ process SummariseNLRs {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(annotator_text)
     output:
@@ -190,9 +190,9 @@ process InputStatistics {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(report)
     output:
@@ -212,9 +212,9 @@ process NLR2Bed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(annotator_text)
     output:
@@ -238,9 +238,9 @@ process SortNLRBed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(annotator_bed)
     output:
@@ -257,9 +257,9 @@ process MapHiFi {
     scratch true
     cpus 8
     memory { 6.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(reads), path(assembly)
     output:
@@ -275,9 +275,9 @@ process ParseAlignment {
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(sam)
     output:
@@ -296,9 +296,9 @@ process CalculateCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(bam), path(nlr_bed), path(index)
     output:
@@ -314,9 +314,9 @@ process ParseCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : 'finish' }
+    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time '15m'
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(coverage_text)
     output:
