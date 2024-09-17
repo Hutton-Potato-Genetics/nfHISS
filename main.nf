@@ -61,10 +61,7 @@ Options:
     --reads <read_file>                         Path to the reads file -
                                                 tab-separated with columns
                                                 'sample','FRead', 'RRead'
-    --bed <bed_file>                            Path to the bed file -
-                                                tab-separated file with columns
-                                                'sample', 'forward', and
-                                                'reverse'
+    --bed <bed_file>                            Path to the bed file
     --adaptor_1 <barcode_fasta_1>               Path to first barcode fasta
     --adaptor_2 <barcode_fasta_2>               Path to second barcode fasta
     --score <bowtie2_score_min>                 Parameter for BowTie2 to
