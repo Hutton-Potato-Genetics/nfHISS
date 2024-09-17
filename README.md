@@ -44,21 +44,45 @@ All paths MUST be absolute paths.
 ### agrenseq
 
 ```
---association_reference <association_reference> Path to fasta file of assembled contigs for
+--association_reference <association_reference>     Path to fasta file of assembled contigs for
                                                     association
---reads <read_scores>                           Path to the reads file - tab-separated file with
-                                                    columns 'sample', 'forward, 'reverse' and 'score'. Where score represents the phenotype, negative is susceptible and positive is resistant
---adaptor_1 <barcode_fasta_1>                   Path to first barcode fasta passed to Cutadapt
---adaptor_2 <barcode_fasta_2>                   Path to second barcode fasta passed to Cutadapt
---blast_reference <blast_reference>             Path to fasta file used as a reference for blastn
---threshold <association_threshold>             Value to use as significance threshold for the
-                                                    association plot
---title <plot_title>                            Title for the assocition plot
---annotator_bed <bed_file_of_nlrs>              Path to bed file used to location candidate NLRs
+--reads <read_scores>                               Path to the reads file - tab-separated file
+                                                    with columns 'sample', 'forward, 'reverse'
+                                                    and 'score'. Where score represents the
+                                                    phenotype, negative is susceptible and
+                                                    positive is resistant
+--adaptor_1 <barcode_fasta_1>                       Path to first barcode fasta passed to
+                                                        Cutadapt
+--adaptor_2 <barcode_fasta_2>                       Path to second barcode fasta passed to
+                                                        Cutadapt
+--blast_reference <blast_reference>                 Path to fasta file used as a reference for
+                                                        blastn
+--threshold <association_threshold>                 Value to use as significance threshold for
+                                                        the association plot
+--title <plot_title>                                Title for the assocition plot
+--annotator_bed <bed_file_of_nlrs>                  Path to bed file used to location candidate
+                                                        NLRs
 ```
 
 ### drenseq
 
 ```
-
+--reference <reference_fasta>               Path to reference fasta file of candidate sequences
+--reads <reads_file>                        Path to reads file - tab-separated with columns
+                                                'sample','FRead', 'RRead'
+--bed <bed_file>                            Path to the bed file of candidate NLRs
+--adaptor_1  <barcode_fasta_1>              Path to first barcode fasta passed to Cutadapt
+--adaptor_2  <barcode_fasta_2>              Path to second barcode fasta passed to Cutadapt
+--score <bowtie2_score_min>                 Parameter passed to bowtie2 to control mismatch rate
+--max_align <maximum_allowed_alignments>    Parameter passed to bowtie2 to control maximum
+                                                number of allowed alignments per read
+--baits <renseq_baits>                      Path to fasta file of the sequences of renseq baits
+--identity <percentage_identity>            Parameter passed to blastn to filter results by
+                                                percentage identity
+--coverage <coverage>                       Parameter passed to blastn to filter results by
+                                                coverage
+--flank <flanking>                          Number of bases to take flanking a blastn hit of
+                                                baits
+--ulimit <ulimit>                           Controls a core unix parameter of maximum file open
+                                                limit to handle large runs
 ```
