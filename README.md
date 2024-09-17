@@ -1,7 +1,7 @@
 # nfHISS
 
-nfHISS is a re-implementation of the HISS pipeline using Nextflow.
-This has been created as a result of recent changes to Snakemake which have reduced its compatibility with SLURM.
+nfHISS is a re-implementation of the [HISS pipeline](https://github.com/SwiftSeal/HISS) using Nextflow.
+This has been created as a result of recent changes to Snakemake which have reduced its compatibility with SLURM. Additionally a change has been made to favour Apptainer over Conda due to reported performance issues and some difficult to reproduce errors during enviornment resolution.
 
 ## Running nfHISS
 
