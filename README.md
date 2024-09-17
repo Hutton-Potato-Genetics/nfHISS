@@ -17,7 +17,7 @@ To run nfHISS, you will first need to have [Nextflow installed](https://www.next
 All nfHISS pipelines are executed through a single command:
 
 ```
-nextflow run SwiftSeal/nfHISS --workflow <workflow> <additional arguments>
+nextflow run SwiftSeal/nfHISS -r main --workflow <workflow> <additional arguments>
 ```
 
 This will download the latest version of nfHISS.
@@ -55,4 +55,10 @@ All paths MUST be absolute paths.
                                                     association plot
 --title <plot_title>                            Title for the assocition plot
 --annotator_bed <bed_file_of_nlrs>              Path to bed file used to location candidate NLRs
+```
+
+### drenseq
+
+```
+
 ```
