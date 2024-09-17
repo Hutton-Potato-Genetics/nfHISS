@@ -80,7 +80,7 @@ Options:
                                                 side of a blastn hit
     --ulimit <ulimit>                           
 
-smrt-renseq --------------------------------------------------------------------
+smrtrenseq --------------------------------------------------------------------
 
 Usage:
     nextflow run Hutton-Potato-Genetics/nfHISS --workflow smrtrenseq \
