@@ -1,3 +1,10 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/HISSlogo_light.png">
+  <img alt="Logo" src="assets/HISSlogo_dark.png">
+</picture>
+
+[![DOI:10.1186/s12859-023-05335-88](http://img.shields.io/badge/DOI-10.1186/s12859.023.05335.8-B31B1b.svg)](https://doi.org/10.1186/s12859-023-05335-8)
+
 # nfHISS
 
 nfHISS is a re-implementation of the [HISS pipeline](https://github.com/SwiftSeal/HISS) using Nextflow.
