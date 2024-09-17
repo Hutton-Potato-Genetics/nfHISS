@@ -58,8 +58,9 @@ Usage:
 
 Options:
     --reference <reference>                     Path to the reference fasta
-    --reads <read_scores>                       Path to the reads file -
-                                                tab-separated file
+    --reads <read_file>                         Path to the reads file -
+                                                tab-separated with columns
+                                                'sample','FRead', 'RRead'
     --bed <bed_file>                            Path to the bed file -
                                                 tab-separated file with columns
                                                 'sample', 'forward', and
