@@ -54,11 +54,28 @@ Usage:
                                                <other options>
 
 Options:
-    --reference <reference>     Path to the reference fasta
-    --reads <read_scores>       Path to the reads file - tab-separated file
-    --bed <bed_file>            Path to the bed file - tab-separated file
-                                with columns 'sample', 'forward', and
-                                'reverse'
+    --reference <reference>                     Path to the reference fasta
+    --reads <read_scores>                       Path to the reads file -
+                                                tab-separated file
+    --bed <bed_file>                            Path to the bed file -
+                                                tab-separated file with columns
+                                                'sample', 'forward', and
+                                                'reverse'
+    --adaptor_1 <barcode_fasta_1>               Path to first barcode fasta
+    --adaptor_2 <barcode_fasta_2>               Path to second barcode fasta
+    --score <bowtie2_score_min>                 Parameter for BowTie2 to
+                                                control allowed mismatch rate
+    --max_align <maximum_allowed_alignments>    Parameter for BowTie2 to control
+                                                maximum alignments allowed
+    --baits <renseq_baits>                      Path to fasta file of RenSeq
+                                                baits
+    --identity <percent_identity>               Parameter for blastn - minimum
+                                                percentage identity
+    --coverage <coverage>                       Parameter for blastn - minimum
+                                                coverage of hit
+    --flank <flanking_region>                   Number of bases to take either
+                                                side of a blastn hit
+    --ulimit <ulimit>                           
 
 smrt-renseq --------------------------------------------------------------------
 
