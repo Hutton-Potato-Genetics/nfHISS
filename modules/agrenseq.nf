@@ -200,7 +200,7 @@ process FinalFilePrep {
     script:
     """
     awk '/^>/ {printf("\\n%s\\n",\$0);next; } { printf("%s",\$0);}  END {printf("\\n");}' < $association_reference | tail -n +2 > unwrapped.fa
-    cat unwrapped.fa | grep -A1 -f $filtered_contigs | sed 's/--//g' | sed '/^$/d' | sed '/^>/ s/ .*//' > candidates.fa
+    cat unwrapped.fa | grep -A1 -f $filtered_contigs | sed 's/--//g' | sed '/^\$/d' | sed '/^>/ s/ .*//' > candidates.fa
     cat $annotator_bed | grep -f $filtered_contigs | cut -f1-4 > candidates.bed
     """
 }
