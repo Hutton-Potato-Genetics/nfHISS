@@ -26,6 +26,8 @@ An example run through of the pipeline is provided, please use this if you inten
 
 ## Detailed options
 
+All paths MUST be absolute paths.
+
 ### smrtrenseq
 
 ```
@@ -37,4 +39,20 @@ An example run through of the pipeline is provided, please use this if you inten
                                                     NLR Annotator
 --five_prime <5'_to_trim>                       5' sequence to be trimmed with Cutadapt
 --three_prime <3'_to_trim>                      3' sequence to be trimmed with Cutadapt
+```
+
+### agrenseq
+
+```
+--association_reference <association_reference> Path to fasta file of assembled contigs for
+                                                    association
+--reads <read_scores>                           Path to the reads file - tab-separated file with
+                                                    columns 'sample', 'forward, 'reverse' and 'score'. Where score represents the phenotype, negative is susceptible and positive is resistant
+--adaptor_1 <barcode_fasta_1>                   Path to first barcode fasta passed to Cutadapt
+--adaptor_2 <barcode_fasta_2>                   Path to second barcode fasta passed to Cutadapt
+--blast_reference <blast_reference>             Path to fasta file used as a reference for blastn
+--threshold <association_threshold>             Value to use as significance threshold for the
+                                                    association plot
+--title <plot_title>                            Title for the assocition plot
+--annotator_bed <bed_file_of_nlrs>              Path to bed file used to location candidate NLRs
 ```
