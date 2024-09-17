@@ -21,3 +21,7 @@ nextflow run SwiftSeal/nfHISS --workflow <workflow> <additional arguments>
 ```
 
 This will download the latest version of nfHISS.
+
+An example run through of the pipeline is provided, please use this if you intend to contribute or before reporting any errors.
+
+## Detailed options
