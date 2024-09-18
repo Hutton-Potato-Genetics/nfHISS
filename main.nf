@@ -22,8 +22,6 @@ Usage:
                                                --threshold <association_threshold> \
                                                --title <plot_title>
 
-
-
 Options:
     --association_reference <association_reference>     Path to the association
                                                         reference fasta
