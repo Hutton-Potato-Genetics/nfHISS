@@ -4,6 +4,7 @@
 </picture>
 
 [![DOI:10.1186/s12859-023-05335-88](http://img.shields.io/badge/DOI-10.1186/s12859.023.05335.8-B31B1b.svg)](https://doi.org/10.1186/s12859-023-05335-8)
+[![DOI](https://zenodo.org/badge/801906921.svg)](https://zenodo.org/doi/10.5281/zenodo.13789522)
 
 # nfHISS
 
