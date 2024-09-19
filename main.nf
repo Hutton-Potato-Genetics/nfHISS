@@ -22,14 +22,12 @@ Usage:
                                                --threshold <association_threshold> \
                                                --title <plot_title>
 
-
-
 Options:
     --association_reference <association_reference>     Path to the association
                                                         reference fasta
     --reads <read_scores>                               Path to the reads file 
                                                         - tab-separated file
-                                                        with columns 'sample'
+                                                        with columns 'sample',
                                                         'forward', 'reverse',
                                                         and 'score'
     --adaptor_1 <barcode_fasta_1>                       Path to first barcode
@@ -58,12 +56,10 @@ Usage:
 
 Options:
     --reference <reference>                     Path to the reference fasta
-    --reads <read_scores>                       Path to the reads file -
-                                                tab-separated file
-    --bed <bed_file>                            Path to the bed file -
-                                                tab-separated file with columns
-                                                'sample', 'forward', and
-                                                'reverse'
+    --reads <read_file>                         Path to the reads file -
+                                                tab-separated with columns
+                                                'sample','FRead', 'RRead'
+    --bed <bed_file>                            Path to the bed file
     --adaptor_1 <barcode_fasta_1>               Path to first barcode fasta
     --adaptor_2 <barcode_fasta_2>               Path to second barcode fasta
     --score <bowtie2_score_min>                 Parameter for BowTie2 to
@@ -80,7 +76,7 @@ Options:
                                                 side of a blastn hit
     --ulimit <ulimit>                           
 
-smrt-renseq --------------------------------------------------------------------
+smrtrenseq --------------------------------------------------------------------
 
 Usage:
     nextflow run Hutton-Potato-Genetics/nfHISS --workflow smrtrenseq \

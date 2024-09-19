@@ -1,0 +1,2 @@
+NLR Contigs	NLR Count	Pseudogenous NLRs	NLR Genes	Complete NLRs	Complete Pseudogenous NLRs
+1799	2527	803	1724	1431	578
