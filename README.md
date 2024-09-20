@@ -47,8 +47,8 @@ All paths MUST be absolute paths.
 --association_reference <association_reference>     Path to fasta file of assembled contigs for
                                                     association
 --reads <read_scores>                               Path to the reads file - tab-separated file
-                                                    with columns 'sample', 'forward, 'reverse'
-                                                    and 'score'. Where score represents the
+                                                    with columns 'sample', 'R1, 'R2' and
+                                                    'score'. Where score represents the
                                                     phenotype, negative is susceptible and
                                                     positive is resistant
 --adaptor_1 <barcode_fasta_1>                       Path to first barcode fasta passed to
