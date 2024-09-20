@@ -28,8 +28,7 @@ Options:
     --reads <read_scores>                               Path to the reads file 
                                                         - tab-separated file
                                                         with columns 'sample',
-                                                        'forward', 'reverse',
-                                                        and 'score'
+                                                        'R1', 'R2', and 'score'
     --adaptor_1 <barcode_fasta_1>                       Path to first barcode
                                                         fasta
     --adaptor_2 <barcode_fasta_2>                       Path to second barcode
