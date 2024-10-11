@@ -18,7 +18,7 @@ To run nfHISS, you will first need to have [Nextflow installed](https://www.next
 All nfHISS pipelines are executed through a single command:
 
 ```
-nextflow run SwiftSeal/nfHISS -r main --workflow <workflow> <additional arguments>
+nextflow run Hutton-Potato-Genetics/nfHISS -r main --workflow <workflow> <additional arguments>
 ```
 
 This will download the latest version of nfHISS.
