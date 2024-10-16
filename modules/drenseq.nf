@@ -69,7 +69,7 @@ process BowtieAlign {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 10.m * task.attempt }
+    time { 30.m * task.attempt }
     input:
     path bowtie2_index
     tuple val(sample), path(read1), path(read2)
@@ -102,10 +102,10 @@ process ParseAlignment {
     container 'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0'
     scratch true
     cpus 2
-    memory { 1.GB * task.attempt }
+    memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 10.m * task.attempt }
+    time { 30.m * task.attempt }
     input:
     tuple val(sample), path(sam)
     output:
