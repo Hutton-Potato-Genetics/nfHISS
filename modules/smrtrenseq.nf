@@ -259,7 +259,7 @@ process MapHiFi {
     memory { 6.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 60.m * task.attempt }
     input:
     tuple val(sample), path(reads), path(assembly)
     output:
