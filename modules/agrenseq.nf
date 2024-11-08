@@ -237,5 +237,5 @@ workflow agrenseq {
 
     (ag_plot, blast_plot, filtered_contigs) = Plot(blast_text, sizes, association, params.threshold, params.title)
 
-    (candidates_fa, candidates_bed) = FinalFilePrep(association_reference, params.bed, filtered_contigs)
+    (candidates_fa, candidates_bed) = FinalFilePrep(association_reference, params.annotator_bed, filtered_contigs)
 }
