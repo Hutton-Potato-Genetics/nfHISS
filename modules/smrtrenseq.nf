@@ -26,7 +26,7 @@ process CanuAssemble {
     memory { 36.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 12.h * task.attempt }
+    time { 72.h * task.attempt }
     input:
     tuple val(sample), path(reads)
     val genome_size
