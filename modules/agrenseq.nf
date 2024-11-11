@@ -108,7 +108,7 @@ process Blast {
     memory { 8.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 45.m * task.attempt }
     input:
     path blast_reference
     path association_reference
