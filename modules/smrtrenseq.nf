@@ -26,7 +26,7 @@ process CanuAssemble {
     memory { 36.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 4.h * task.attempt }
+    time { 72.h * task.attempt }
     input:
     tuple val(sample), path(reads)
     val genome_size
@@ -68,7 +68,7 @@ process SeqkitStats {
 }
 
 process ChopSequences {
-    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
+    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
@@ -86,7 +86,7 @@ process ChopSequences {
 }
 
 process NLRParser {
-    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
+    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
     scratch true
     cpus 2
     memory { 3.GB * task.attempt }
@@ -104,7 +104,7 @@ process NLRParser {
 }
 
 process NLRAnnotator {
-    conda 'bioconda::meme=5.4.1 conda-forge::openjdk=11.0.1'
+    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
@@ -259,7 +259,7 @@ process MapHiFi {
     memory { 6.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 60.m * task.attempt }
     input:
     tuple val(sample), path(reads), path(assembly)
     output:
