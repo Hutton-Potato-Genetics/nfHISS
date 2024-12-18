@@ -68,7 +68,7 @@ process SeqkitStats {
 }
 
 process ChopSequences {
-    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
+    container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be8724'
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
@@ -86,7 +86,7 @@ process ChopSequences {
 }
 
 process NLRParser {
-    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
+    container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
     memory { 3.GB * task.attempt }
@@ -104,7 +104,7 @@ process NLRParser {
 }
 
 process NLRAnnotator {
-    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
+    container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
