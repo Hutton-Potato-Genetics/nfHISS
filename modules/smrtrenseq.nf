@@ -92,7 +92,7 @@ process NLRParser {
     memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 30.m * task.attempt }
+    time { 60.m * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
