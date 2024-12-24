@@ -74,7 +74,7 @@ process ChopSequences {
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 60.m * task.attempt }
+    time { 120.m * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
