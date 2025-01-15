@@ -23,7 +23,7 @@ process CanuAssemble {
     container 'docker://quay.io/biocontainers/canu:2.2--ha47f30e_0'
     scratch true
     cpus 8
-    memory { 144.GB * task.attempt }
+    memory { 220.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
     time { 72.h * task.attempt }
