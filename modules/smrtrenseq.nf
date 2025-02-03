@@ -74,7 +74,7 @@ process ChopSequences {
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 23.h * task.attempt }
+    time { 5.d * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
@@ -92,7 +92,7 @@ process NLRParser {
     memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 23.h * task.attempt }
+    time { 5.d * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
@@ -110,7 +110,7 @@ process NLRAnnotator {
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 23.h * task.attempt }
+    time { 5.d * task.attempt }
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
