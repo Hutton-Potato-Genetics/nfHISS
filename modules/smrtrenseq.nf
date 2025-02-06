@@ -71,7 +71,7 @@ process ChopSequences {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 1
-    memory { 3.GB * task.attempt }
+    memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
     time { 14.d * task.attempt }
@@ -89,7 +89,7 @@ process NLRParser {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
-    memory { 3.GB * task.attempt }
+    memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
     time { 14.d * task.attempt }
@@ -107,7 +107,7 @@ process NLRAnnotator {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 1
-    memory { 3.GB * task.attempt }
+    memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
     time { 14.d * task.attempt }
