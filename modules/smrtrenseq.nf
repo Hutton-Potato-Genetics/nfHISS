@@ -81,7 +81,7 @@ process ChopSequences {
     tuple val(sample), path('chopped.fa')
     script:
     """
-    chop_sequences.sh -i $assembly -o chopped.fa -m ${$task.memory.toMega()}
+    chop_sequences.sh -i $assembly -o chopped.fa -m ${task.memory.toMega()}
     """
 }
 
@@ -99,7 +99,7 @@ process NLRParser {
     tuple val(sample), path('parser.xml')
     script:
     """
-    nlr_parser.sh -t $task.cpus -i $chopped -c parser.xml -m ${$task.memory.toMega()}
+    nlr_parser.sh -t $task.cpus -i $chopped -c parser.xml -m ${task.memory.toMega()}
     """
 }
 
@@ -120,7 +120,7 @@ process NLRAnnotator {
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    nlr_annotator.sh -i $parser_xml -o ${sample}_NLR_annotator.txt -f $assembly ${sample}_NLR_annotator.fa $flanking -m ${$task.memory.toMega()}
+    nlr_annotator.sh -i $parser_xml -o ${sample}_NLR_annotator.txt -f $assembly ${sample}_NLR_annotator.fa $flanking -m ${task.memory.toMega()}
     """
 }
 
