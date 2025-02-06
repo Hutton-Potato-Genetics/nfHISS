@@ -256,10 +256,10 @@ process MapHiFi {
     container 'https://depot.galaxyproject.org/singularity/minimap2:2.28--he4a0461_0'
     scratch true
     cpus 8
-    memory { 6.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 60.m * task.attempt }
+    time { 20.m * task.attempt }
     input:
     tuple val(sample), path(reads), path(assembly)
     output:
