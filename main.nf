@@ -20,7 +20,8 @@ Usage:
                                                --adaptor_2 <barcode_fasta_2> \
                                                --blast_reference <blast_reference> \
                                                --threshold <association_threshold> \
-                                               --title <plot_title>
+                                               --title <plot_title> \
+                                               --annotator_bed <annotator_bed>
 
 Options:
     --association_reference <association_reference>     Path to the association
@@ -49,9 +50,17 @@ drenseq -----------------------------------------------------------------------
 Usage:
     nextflow run Hutton-Potato-Genetics/nfHISS --workflow drenseq \
                                                --reference <reference> \
-                                               --bed <bed_file> \
                                                --reads <read_scores> \
-                                               <other options>
+                                               --bed <bed_file> \
+                                               --adaptor_1 <barcode_fasta_1> \
+                                               --adaptor_2 <barcode_fasta_2> \
+                                               --score <bowtie2_score_min> \
+                                               --max_align <maximum_allowed_alignments> \
+                                               --baits <renseq_baits> \
+                                               --identity <percent_identity> \
+                                               --coverage <coverage> \
+                                               --flank <flanking_region> \
+                                               --ulimit <ulimit>
 
 Options:
     --reference <reference>                     Path to the reference fasta
@@ -73,7 +82,8 @@ Options:
                                                 coverage of hit
     --flank <flanking_region>                   Number of bases to take either
                                                 side of a blastn hit
-    --ulimit <ulimit>                           
+    --ulimit <ulimit>                           Set an increased ulimit with
+                                                large sample sizes
 
 smrtrenseq --------------------------------------------------------------------
 
