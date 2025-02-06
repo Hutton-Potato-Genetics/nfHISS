@@ -106,11 +106,11 @@ process NLRParser {
 process NLRAnnotator {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
-    cpus 2
-    memory { 2.GB * task.attempt }
+    cpus 1
+    memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 5.d * task.attempt }
+    time { 14.d * task.attempt }
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
