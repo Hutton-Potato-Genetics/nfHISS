@@ -21,12 +21,12 @@ process TrimReads {
 
 process CanuAssemble {
     container 'docker://quay.io/biocontainers/canu:2.2--ha47f30e_0'
-    scratch true
+    scratch false
     cpus 8
-    memory { 36.GB * task.attempt }
+    memory { 500.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 72.h * task.attempt }
+    time { 300.h * task.attempt }
     input:
     tuple val(sample), path(reads)
     val genome_size
@@ -68,13 +68,13 @@ process SeqkitStats {
 }
 
 process ChopSequences {
-    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
+    container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 5.d * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
@@ -86,13 +86,13 @@ process ChopSequences {
 }
 
 process NLRParser {
-    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
+    container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
     memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 5.d * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
@@ -104,13 +104,13 @@ process NLRParser {
 }
 
 process NLRAnnotator {
-    container 'docker://quay.io/biocontainers/meme:5.4.1--py310pl5321hb021246_2'
+    container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 5.d * task.attempt }
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
