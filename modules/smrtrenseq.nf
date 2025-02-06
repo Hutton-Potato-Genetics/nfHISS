@@ -71,7 +71,7 @@ process ChopSequences {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 1
-    memory { 2.GB * task.attempt }
+    memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
     time { 14.d * task.attempt }
@@ -92,7 +92,7 @@ process NLRParser {
     memory { 3.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 5.d * task.attempt }
+    time { 14.d * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
