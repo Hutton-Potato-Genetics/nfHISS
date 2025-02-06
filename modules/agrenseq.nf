@@ -76,7 +76,7 @@ process NLRParser {
     path 'nlrparser.txt'
     script:
     """
-    nlr_parser.sh -t ${task.cpus} -i $reference -o nlrparser.txt
+    nlr_parser.sh -Xmx${task.memory.toMega()}M -t ${task.cpus} -i $reference -o nlrparser.txt
     """
 }
 
