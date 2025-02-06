@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar "$(dirname "$0")/ChopSequence.jar" "$@"
+java $1 -jar "$(dirname "$0")/ChopSequence.jar" "$@:2"
