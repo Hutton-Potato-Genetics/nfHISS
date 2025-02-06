@@ -1,11 +1,11 @@
 process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
-    cpus 8
+    cpus 2
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 45.m * task.attempt }
     input:
     tuple val(sample), path(reads)
     val five_prime
