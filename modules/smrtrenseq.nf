@@ -316,7 +316,7 @@ process ParseCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(coverage_text)
     output:
