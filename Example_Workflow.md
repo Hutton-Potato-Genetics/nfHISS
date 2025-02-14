@@ -40,7 +40,7 @@ nextflow run /path/to/nfHiss --workflow smrtrenseq --reads /path/to/example_inpu
 ```bash
 mkdir -p /path/to/directory/for/association
 cd /path/to/directory/for/association
-nextflow run /path/to/nfHiss --workflow agrenseq --reads /path/to/example_inputs/agrenseq/read_scores.txt --adaptor_1 /path/to/example_inputs/agrenseq/Index2varN.fasta --adaptor_2  /path/to/example_inputs/agrenseq/Universal_var.fasta --association_reference /path/to/assembly/from/smrtrenseq --blast_reference /path/to/PGSC_DM_v4.03_pseudomolecules.fasta --threshold 26 --title Gemson --bed /path/to/nlr/bed/from/smrtrenseq
+nextflow run /path/to/nfHiss --workflow agrenseq --reads /path/to/example_inputs/agrenseq/read_scores.txt --adaptor_1 /path/to/example_inputs/agrenseq/Index2varN.fasta --adaptor_2  /path/to/example_inputs/agrenseq/Universal_var.fasta --association_reference /path/to/assembly/from/smrtrenseq --blast_reference /path/to/PGSC_DM_v4.03_pseudomolecules.fasta --threshold 26 --title Gemson --annotator_bed /path/to/nlr/bed/from/smrtrenseq
 ```
 
 ## Perform drenseq
