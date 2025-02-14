@@ -15,8 +15,6 @@ This has been created as a result of recent changes to Snakemake which have redu
 
 To run nfHISS, you will first need to have [Nextflow installed](https://www.nextflow.io/docs/latest/install.html). Nextflow is also available on [bioconda](https://anaconda.org/bioconda/nextflow) for systems where users do not have sudo rights.
 
-You will also require an install of java, this workflow has been tested with open-jdk v11.0.1
-
 All nfHISS pipelines are executed through a single command:
 
 ```
