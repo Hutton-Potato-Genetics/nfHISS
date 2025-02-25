@@ -1,11 +1,11 @@
 process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
-    cpus 8
+    cpus 2
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 45.m * task.attempt }
     input:
     tuple val(sample), path(reads)
     val five_prime
@@ -26,7 +26,7 @@ process CanuAssemble {
     memory { 500.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 300.h * task.attempt }
+    time { 30.h * task.attempt }
     input:
     tuple val(sample), path(reads)
     val genome_size
@@ -55,7 +55,7 @@ process SeqkitStats {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
@@ -70,18 +70,18 @@ process SeqkitStats {
 process ChopSequences {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
-    cpus 2
-    memory { 2.GB * task.attempt }
+    cpus 1
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 5.d * task.attempt }
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
     tuple val(sample), path('chopped.fa')
     script:
     """
-    chop_sequences.sh -i $assembly -o chopped.fa
+    chop_sequences.sh -Xmx${task.memory.toMega()}M -i $assembly -o chopped.fa
     """
 }
 
@@ -89,28 +89,28 @@ process NLRParser {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
-    memory { 3.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 5.d * task.attempt }
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
     tuple val(sample), path('parser.xml')
     script:
     """
-    nlr_parser.sh -t $task.cpus -i $chopped -c parser.xml
+    nlr_parser.sh -Xmx${task.memory.toMega()}M -t $task.cpus -i $chopped -c parser.xml
     """
 }
 
 process NLRAnnotator {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
-    cpus 2
-    memory { 2.GB * task.attempt }
+    cpus 1
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 5.d * task.attempt }
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
@@ -120,7 +120,7 @@ process NLRAnnotator {
     publishDir "results/${sample}", mode: 'copy'
     script:
     """
-    nlr_annotator.sh -i $parser_xml -o ${sample}_NLR_annotator.txt -f $assembly ${sample}_NLR_annotator.fa $flanking
+    nlr_annotator.sh -Xmx${task.memory.toMega()}M -i $parser_xml -o ${sample}_NLR_annotator.txt -f $assembly ${sample}_NLR_annotator.fa $flanking
     """
 }
 
@@ -131,7 +131,7 @@ process SummariseNLRs {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(annotator_text)
     output:
@@ -192,7 +192,7 @@ process InputStatistics {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(report)
     output:
@@ -214,7 +214,7 @@ process NLR2Bed {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(annotator_text)
     output:
@@ -240,7 +240,7 @@ process SortNLRBed {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(annotator_bed)
     output:
@@ -256,10 +256,10 @@ process MapHiFi {
     container 'https://depot.galaxyproject.org/singularity/minimap2:2.28--he4a0461_0'
     scratch true
     cpus 8
-    memory { 6.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 60.m * task.attempt }
+    time { 20.m * task.attempt }
     input:
     tuple val(sample), path(reads), path(assembly)
     output:
@@ -277,7 +277,7 @@ process ParseAlignment {
     memory { 2.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(sam)
     output:
@@ -298,7 +298,7 @@ process CalculateCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(bam), path(nlr_bed), path(index)
     output:
@@ -316,7 +316,7 @@ process ParseCoverage {
     memory { 1.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 15.m * task.attempt }
+    time { 10.m * task.attempt }
     input:
     tuple val(sample), path(coverage_text)
     output:
