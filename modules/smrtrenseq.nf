@@ -71,10 +71,10 @@ process ChopSequences {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 1
-    memory { 10.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 14.d * task.attempt }
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly)
     output:
@@ -89,10 +89,10 @@ process NLRParser {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 2
-    memory { 10.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 14.d * task.attempt }
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(chopped)
     output:
@@ -107,10 +107,10 @@ process NLRAnnotator {
     container 'community.wave.seqera.io/library/meme_openjdk:3e840cb4617be872'
     scratch true
     cpus 1
-    memory { 10.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
     maxRetries 3
-    time { 14.d * task.attempt }
+    time { 15.m * task.attempt }
     input:
     tuple val(sample), path(assembly), path(parser_xml)
     val flanking
