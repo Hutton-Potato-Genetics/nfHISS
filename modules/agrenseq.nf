@@ -204,7 +204,7 @@ process FinalFilePrep {
     cat unwrapped.fa | grep -A1 -f $filtered_contigs | sed 's/--//g' | sed '/^\$/d' | sed '/^>/ s/ .*//' > candidates.fa
     cat $annotator_bed | grep -f $filtered_contigs | cut -f1-4 > candidates.bed
     cat $annotator_bed | grep -f $filtered_contigs | cut -f1 | sort | uniq > nlr_hits.txt
-    cat unwrapped.fa | grep -A1 -f nlr_hits | sed 's/--//g' | sed '/^\$/d' | sed '/^>/ s/ .*//' > nlr_annotator_positive_candidates.fa
+    cat unwrapped.fa | grep -A1 -f nlr_hits.txt | sed 's/--//g' | sed '/^\$/d' | sed '/^>/ s/ .*//' > nlr_annotator_positive_candidates.fa
     """
 }
 
