@@ -196,12 +196,15 @@ process FinalFilePrep {
     output:
     path 'candidates.fa'
     path 'candidates.bed'
+    path 'nlr_annotator_positive_candidates.fa'
     publishDir 'results', mode: 'copy'
     script:
     """
     awk '/^>/ {printf("\\n%s\\n",\$0);next; } { printf("%s",\$0);}  END {printf("\\n");}' < $association_reference | tail -n +2 > unwrapped.fa
     cat unwrapped.fa | grep -A1 -f $filtered_contigs | sed 's/--//g' | sed '/^\$/d' | sed '/^>/ s/ .*//' > candidates.fa
     cat $annotator_bed | grep -f $filtered_contigs | cut -f1-4 > candidates.bed
+    cat $annotator_bed | grep -f $filtered_contigs | cut -f1 | sort | uniq > nlr_hits.txt
+    cat unwrapped.fa | grep -A1 -f nlr_hits.txt | sed 's/--//g' | sed '/^\$/d' | sed '/^>/ s/ .*//' > nlr_annotator_positive_candidates.fa
     """
 }
 
