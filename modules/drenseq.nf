@@ -2,7 +2,7 @@ process TrimBed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     time { 10.m * task.attempt }
     input:
     path bed
@@ -19,7 +19,7 @@ process TrimReads {
     scratch true
     cpus 8
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -48,7 +48,7 @@ process BowtieBuild {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -67,7 +67,7 @@ process BowtieAlign {
     scratch true
     cpus 8
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 30.m * task.attempt }
     input:
@@ -103,7 +103,7 @@ process ParseAlignment {
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 30.m * task.attempt }
     input:
@@ -124,7 +124,7 @@ process StrictFilter {
     scratch true
     cpus 2
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -149,7 +149,7 @@ process BaitsBlasting {
     scratch true
     cpus 8
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -178,7 +178,7 @@ process Headers {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -200,7 +200,7 @@ process IdentifyBaitRegions {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -221,7 +221,7 @@ process AnnotatorBaits {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -240,7 +240,7 @@ process BaitBlastCheck {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -282,7 +282,7 @@ process BedtoolsCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -304,7 +304,7 @@ process PerGeneCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -334,7 +334,7 @@ process CombineGeneCoverages {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -352,7 +352,7 @@ process CombineCoverageValues {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -373,7 +373,7 @@ process TransposeCombinedCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:

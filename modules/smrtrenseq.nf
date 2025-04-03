@@ -3,7 +3,7 @@ process TrimReads {
     scratch true
     cpus 2
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 45.m * task.attempt }
     input:
@@ -24,7 +24,7 @@ process CanuAssemble {
     scratch false
     cpus 8
     memory { 500.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 30.h * task.attempt }
     input:
@@ -53,7 +53,7 @@ process SeqkitStats {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -72,7 +72,7 @@ process ChopSequences {
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 15.m * task.attempt }
     input:
@@ -90,7 +90,7 @@ process NLRParser {
     scratch true
     cpus 2
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 15.m * task.attempt }
     input:
@@ -108,7 +108,7 @@ process NLRAnnotator {
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 15.m * task.attempt }
     input:
@@ -129,7 +129,7 @@ process SummariseNLRs {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -190,7 +190,7 @@ process InputStatistics {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -212,7 +212,7 @@ process NLR2Bed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -238,7 +238,7 @@ process SortNLRBed {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -257,7 +257,7 @@ process MapHiFi {
     scratch true
     cpus 8
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 20.m * task.attempt }
     input:
@@ -275,7 +275,7 @@ process ParseAlignment {
     scratch true
     cpus 2
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -296,7 +296,7 @@ process CalculateCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -314,7 +314,7 @@ process ParseCoverage {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
