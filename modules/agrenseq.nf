@@ -3,7 +3,7 @@ process TrimReads {
     scratch true
     cpus 8
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -30,7 +30,7 @@ process CountKmers {
     scratch true
     cpus 2
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -49,7 +49,7 @@ process CreatePresenceMatrix {
     scratch true
     cpus 1
     memory { 32.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 1.h * task.attempt }
     input:
@@ -67,7 +67,7 @@ process NLRParser {
     scratch true
     cpus 4
     memory { 2.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -84,7 +84,7 @@ process RunAssociation {
     scratch true
     cpus 2
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 15.m * task.attempt }
     input:
@@ -106,7 +106,7 @@ process Blast {
     scratch true
     cpus 8
     memory { 8.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 45.m * task.attempt }
     input:
@@ -125,7 +125,7 @@ process SortBlast {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -143,7 +143,7 @@ process GetSizes {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -161,7 +161,7 @@ process Plot {
     scratch true
     cpus 1
     memory { 1.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 10.m * task.attempt }
     input:
@@ -186,7 +186,7 @@ process FinalFilePrep {
     scratch true
     cpus 1
     memory { 4.GB * task.attempt }
-    errorStrategy { task.exitStatus == 137 ? 'retry' : (task.exitStatus == 140 ? 'retry': 'finish') }
+    errorStrategy { task.exitStatus in [137, 140] ? 'retry' : 'finish' }
     maxRetries 3
     time { 15.m * task.attempt }
     input:
