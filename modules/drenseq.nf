@@ -244,7 +244,7 @@ process BaitBlastCheck {
     time { 10.m * task.attempt }
     input:
     path nlr_bait_regions_bed
-    path reference_headers
+    path nlr_headers
     output:
     path 'passed_genes.txt'
     path 'missing_genes.txt'
@@ -259,16 +259,14 @@ process BaitBlastCheck {
         for line in bed:
             bed_nlr.add(line.strip().split()[3])
     
-    with open("$reference_headers") as headers:
+    with open("$nlr_headers") as headers:
         next(headers) # skip the header
-        for line in headers:
-            with open("missing_genes.txt", "w") as missed:
+        with open("missing_genes.txt", "w") as missed:
+            for line in headers:
                 nlr = line.strip()
                 if nlr not in bed_nlr:
                     string_to_write = nlr + " not found in bed file"
                     print(string_to_write, file = missed)
-        with open("missing_genes.txt", "w") as missed:
-            print("\\n", file = missed)
     
     with open("passed_genes.txt", "w") as passed:
         for nlr in bed_nlr:
@@ -419,7 +417,7 @@ workflow drenseq {
 
     nlr_bait_regions_bed = AnnotatorBaits(bait_regions_bed, trimmed_bed)
 
-    (passed, missed) = BaitBlastCheck(nlr_bait_regions_bed, reference_headers)
+    (passed, missed) = BaitBlastCheck(nlr_bait_regions_bed, nlr_headers)
 
     coverage = BedtoolsCoverage(nlr_bait_regions_bed, strict_bam, passed)
 
