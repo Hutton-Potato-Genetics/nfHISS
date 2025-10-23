@@ -32,7 +32,7 @@ Ensure to add the absolute path to the pacbio reads (ERR10385989) to your sample
 ```bash
 mkdir -p /path/to/directory/for/assembly
 cd /path/to/directory/for/assembly
-nextflow run /path/to/nfHiss --workflow smrtrenseq --reads /path/to/example_inputs/smrtrenseq/sample.txt --genome_size 2000000 --max_input_coverage 20000 --flanking 1000 --five_prime GGTAGT --three_prime ACTACC
+nextflow run Hutton-Potato-Genetics/nfHiss --workflow smrtrenseq --reads /path/to/example_inputs/smrtrenseq/sample.txt --genome_size 2000000 --max_input_coverage 20000 --flanking 1000 --five_prime GGTAGT --three_prime ACTACC
 ```
 
 ## Perform AgRenSeq
@@ -42,7 +42,7 @@ Ensure to add the paths to your downloaded reads to read_scores.txt
 ```bash
 mkdir -p /path/to/directory/for/association
 cd /path/to/directory/for/association
-nextflow run /path/to/nfHiss --workflow agrenseq --reads /path/to/example_inputs/agrenseq/read_scores.txt --adaptor_1 /path/to/example_inputs/agrenseq/Index2varN.fasta --adaptor_2  /path/to/example_inputs/agrenseq/Universal_var.fasta --association_reference /path/to/assembly/from/smrtrenseq --blast_reference /path/to/PGSC_DM_v4.03_pseudomolecules.fasta --threshold 26 --title Gemson --annotator_bed /path/to/nlr/bed/from/smrtrenseq
+nextflow run Hutton-Potato-Genetics/nfHiss --workflow agrenseq --reads /path/to/example_inputs/agrenseq/read_scores.txt --adaptor_1 /path/to/example_inputs/agrenseq/Index2varN.fasta --adaptor_2  /path/to/example_inputs/agrenseq/Universal_var.fasta --association_reference /path/to/assembly/from/smrtrenseq --blast_reference /path/to/PGSC_DM_v4.03_pseudomolecules.fasta --threshold 26 --title Gemson --annotator_bed /path/to/nlr/bed/from/smrtrenseq
 ```
 
 ## Perform drenseq
@@ -52,7 +52,7 @@ Ensure to add the paths to your downloaded reads to samples.tsv
 ```bash
 mkdir -p /path/to/directory/for/drenseq
 cd /path/to/directory/for/drenseq
-nextflow run /path/to/nfHISS --workflow drenseq --reference /path/to/example_inputs/drenseq/Gemson_candidates.fa --bed /path/to/example_inputs/drenseq/Gemson_candidates.bed --reads /path/to/example_inputs/drenseq/samples.tsv --score "L,0,-0.24" --max_align 10 --baits /path/to/example_inputs/drenseq/Solanum_baits.fasta --identity 90 --coverage 90 --flank 0 --ulimit 1024 --adaptor_1 /path/to/example_inputs/drenseq/Index2varN.fasta --adaptor_2 /path/to/example_inputs/drenseq/Universal_var.fasta
+nextflow run Hutton-Potato-Genetics/nfHISS --workflow drenseq --reference /path/to/example_inputs/drenseq/Gemson_candidates.fa --bed /path/to/example_inputs/drenseq/Gemson_candidates.bed --reads /path/to/example_inputs/drenseq/samples.tsv --score "L,0,-0.24" --max_align 10 --baits /path/to/example_inputs/drenseq/Solanum_baits.fasta --identity 90 --coverage 90 --flank 0 --ulimit 1024 --adaptor_1 /path/to/example_inputs/drenseq/Index2varN.fasta --adaptor_2 /path/to/example_inputs/drenseq/Universal_var.fasta
 ```
 
 This should show tig00001343\_nlr_1 as the only candidate with 100% coverage in all samples scored as 1 in the read scores file used for AgRenSeq. The nucleotide sequence for this can be found in the NLR Annotator output fasta in the SMRT-RenSeq assembly directory. When BLASTed against the NCBI nr/nt database, the top hit is the reference _Rx_ sequence.
