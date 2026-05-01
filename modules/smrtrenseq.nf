@@ -343,7 +343,7 @@ process ParseCoverage {
     """
 }
 
-workflow smrtrenseq {
+workflow {
     main:
     reads = channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
     
