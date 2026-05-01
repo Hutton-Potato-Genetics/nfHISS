@@ -1,5 +1,3 @@
-workflow.output.mode = 'copy'
-
 process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true

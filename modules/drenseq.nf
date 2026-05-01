@@ -1,5 +1,3 @@
-workflow.output.mode = 'copy'
-
 process TrimBed {
     scratch true
     cpus 1
