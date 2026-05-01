@@ -389,7 +389,7 @@ process TransposeCombinedCoverage {
     """
 }
 
-workflow {
+workflow drenseq {
     main:
     bowtie2_index = channel
         .fromPath(params.reference) \
