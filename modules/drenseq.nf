@@ -1,3 +1,5 @@
+workflow.output.mode = 'copy'
+
 process TrimBed {
     scratch true
     cpus 1
@@ -248,7 +250,7 @@ process BaitBlastCheck {
     output:
     path 'passed_genes.txt'
     path 'missing_genes.txt'
-    publishDir 'results/diagnostics', mode: 'copy'
+    // publishDir 'results/diagnostics', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -377,7 +379,7 @@ process TransposeCombinedCoverage {
     path all_coverage_values
     output:
     path 'all_coverage_values_transposed.txt'
-    publishDir 'results', mode: 'copy'
+    // publishDir 'results', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -390,6 +392,7 @@ process TransposeCombinedCoverage {
 }
 
 workflow drenseq {
+    main:
     bowtie2_index = channel
         .fromPath(params.reference) \
         | BowtieBuild
@@ -428,4 +431,22 @@ workflow drenseq {
     all_coverage_values = CombineCoverageValues(sample_coverage.collect(), nlr_headers, params.ulimit)
 
     transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
+
+    publish:
+    passed_genes = passed
+    missed_genes = missed
+    cov = transposed_coverage
+}
+
+output {
+    passed_genes {
+        path 'diagnostics'
+    }
+
+    missed_genes {
+        path 'diagnostics'
+    }
+
+    cov {
+    }
 }

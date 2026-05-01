@@ -1,3 +1,5 @@
+workflow.output.mode = 'copy'
+
 process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
@@ -94,7 +96,7 @@ process RunAssociation {
     path nlrparser
     output:
     path 'agrenseq_result.txt'
-    publishDir 'results', mode: 'copy'
+    // publishDir 'results', mode: 'copy'
     script:
     """
     run_association.sh ${task.memory.toGiga()}G -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
@@ -174,7 +176,7 @@ process Plot {
     path 'AgRenSeq_plot.png'
     path 'Blast_plot.png'
     path 'filtered_contigs.txt'
-    publishDir 'results', mode: 'copy'
+    // publishDir 'results', mode: 'copy'
     script:
     """
     plot.R $association_results $threshold $title filtered_contigs.txt AgRenSeq_plot.png
@@ -197,7 +199,7 @@ process FinalFilePrep {
     path 'candidates.fa'
     path 'candidates.bed'
     path 'nlr_annotator_positive_candidates.fa'
-    publishDir 'results', mode: 'copy'
+    // publishDir 'results', mode: 'copy'
     script:
     """
     awk '/^>/ {printf("\\n%s\\n",\$0);next; } { printf("%s",\$0);}  END {printf("\\n");}' < $association_reference | tail -n +2 > unwrapped.fa
@@ -209,6 +211,7 @@ process FinalFilePrep {
 }
 
 workflow agrenseq {
+    main:
     reads = channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.R1), file(row.R2)) }
 
     trimmed_reads = TrimReads(reads, params.adaptor_1, params.adaptor_2)
@@ -240,5 +243,37 @@ workflow agrenseq {
 
     (ag_plot, blast_plot, filtered_contigs) = Plot(blast_text, sizes, association, params.threshold, params.title)
 
-    (candidates_fa, candidates_bed) = FinalFilePrep(association_reference, params.annotator_bed, filtered_contigs)
+    (candidates_fa, candidates_bed, nlr_candidates) = FinalFilePrep(association_reference, params.annotator_bed, filtered_contigs)
+
+    publish:
+    association_txt = association
+    association_plot = ag_plot
+    bl_plot = blast_plot
+    contigs = filtered_contigs
+    cand_fa = candidates_fa
+    cand_bed = candidates_bed
+    cand_nlr_pos = nlr_candidates
+}
+
+output {
+    association_txt {
+    }
+
+    association_plot {
+    }
+
+    bl_plot {
+    }
+
+    contigs {
+    }
+
+    cand_fa {
+    }
+
+    cand_bed {
+    }
+
+    cand_nlr_pos {
+    }
 }
