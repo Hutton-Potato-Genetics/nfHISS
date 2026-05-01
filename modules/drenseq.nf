@@ -430,21 +430,8 @@ workflow drenseq {
 
     transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
 
-    publish:
+    emit:
     passed_genes = passed
     missed_genes = missed
     cov = transposed_coverage
-}
-
-output {
-    passed_genes {
-        path 'diagnostics'
-    }
-
-    missed_genes {
-        path 'diagnostics'
-    }
-
-    cov {
-    }
 }

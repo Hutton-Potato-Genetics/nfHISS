@@ -243,7 +243,7 @@ workflow agrenseq {
 
     (candidates_fa, candidates_bed, nlr_candidates) = FinalFilePrep(association_reference, params.annotator_bed, filtered_contigs)
 
-    publish:
+    emit:
     association_txt = association
     association_plot = ag_plot
     bl_plot = blast_plot
@@ -251,27 +251,4 @@ workflow agrenseq {
     cand_fa = candidates_fa
     cand_bed = candidates_bed
     cand_nlr_pos = nlr_candidates
-}
-
-output {
-    association_txt {
-    }
-
-    association_plot {
-    }
-
-    bl_plot {
-    }
-
-    contigs {
-    }
-
-    cand_fa {
-    }
-
-    cand_bed {
-    }
-
-    cand_nlr_pos {
-    }
 }

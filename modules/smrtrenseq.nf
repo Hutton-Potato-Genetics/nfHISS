@@ -373,8 +373,8 @@ workflow smrtrenseq {
 
     parsed_coverage = ParseCoverage(coverage)
 
-    publish:
-    contigs = assembly
+    emit:
+    contigs_out = assembly
     rep = report
     stat = stats
     ann_txt = annotator_text
@@ -383,42 +383,4 @@ workflow smrtrenseq {
     in_stat = input_stats
     nlr_sort_bed = sorted_bed
     cov_parse = parsed_coverage
-}
-
-output {
-    contigs {
-        path { sample, assembled_contigs -> "${sample}" }
-    }
-
-    rep {
-        path { sample, assembly_report -> "${sample}" }
-    }
-
-    stat {
-        path { sample, seqkit_out -> "${sample}" }
-    }
-
-    ann_txt {
-        path { sample, nlr_annotator_txt -> "${sample}" }
-    }
-
-    ann_fa {
-        path { sample, nlr_annotator_fa -> "${sample}" }
-    }
-
-    nlr_sum {
-        path { sample, summary_of_nlrs -> "${sample}" }
-    }
-
-    in_stat {
-        path { sample, stats_input -> "${sample}" }
-    }
-
-    nlr_sort_bed {
-        path { sample, sorted_nlr_bed -> "${sample}" }
-    }
-
-    cov_parse {
-        path { sample, parsed_nlr_coverage -> "${sample}" }
-    }
 }
