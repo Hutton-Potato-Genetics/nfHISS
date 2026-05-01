@@ -242,6 +242,15 @@ workflow agrenseq {
     (ag_plot, blast_plot, filtered_contigs) = Plot(blast_text, sizes, association, params.threshold, params.title)
 
     (candidates_fa, candidates_bed, nlr_candidates) = FinalFilePrep(association_reference, params.annotator_bed, filtered_contigs)
+
+    publish:
+    association_txt = association
+    association_plot = ag_plot
+    bl_plot = blast_plot
+    contigs = filtered_contigs
+    cand_fa = candidates_fa
+    cand_bed = candidates_bed
+    cand_nlr_pos = nlr_candidates
 }
 
 output {
@@ -254,7 +263,7 @@ output {
     bl_plot {
     }
 
-    contigs_out {
+    contigs {
     }
 
     cand_fa {

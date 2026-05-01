@@ -429,6 +429,11 @@ workflow drenseq {
     all_coverage_values = CombineCoverageValues(sample_coverage.collect(), nlr_headers, params.ulimit)
 
     transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
+
+    publish:
+    passed_genes = passed
+    missed_genes = missed
+    cov = transposed_coverage
 }
 
 output {
