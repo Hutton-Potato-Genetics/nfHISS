@@ -390,13 +390,13 @@ process TransposeCombinedCoverage {
 }
 
 workflow drenseq {
-    bowtie2_index = Channel
+    bowtie2_index = channel
         .fromPath(params.reference) \
         | BowtieBuild
 
     trimmed_bed = TrimBed(file(params.bed))
 
-    reads = Channel
+    reads = channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
         .map { row -> tuple(row.sample, file(row.FRead), file(row.RRead)) }

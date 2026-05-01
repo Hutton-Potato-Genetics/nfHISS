@@ -342,7 +342,7 @@ process ParseCoverage {
 }
 
 workflow smrtrenseq {
-    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
+    reads = channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
     
     trimmed_reads = TrimReads(reads, params.five_prime, params.three_prime)
 
