@@ -5,103 +5,109 @@ include { smrtrenseq } from './modules/smrtrenseq.nf'
 workflow {
     main:
     if (params.workflow == "agrenseq") {
-        agrenseq()
+        ag_results = agrenseq()
     } else if (params.workflow == "drenseq") {
-        drenseq()
+        dren_results = drenseq()
     } else if (params.workflow == "smrtrenseq") {
-        smrtrenseq()
+        smrt_results = smrtrenseq()
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
 
     publish:
-    association_txt = association
-    association_plot = ag_plot
-    bl_plot = blast_plot
-    contigs = filtered_contigs
-    cand_fa = candidates_fa
-    cand_bed = candidates_bed
-    cand_nlr_pos = nlr_candidates
-    passed_genes = passed
-    missed_genes = missed
-    cov = transposed_coverage
-    contigs_out = assembly
-    rep = report
-    stat = stats
-    ann_txt = annotator_text
-    ann_fa = annotator_fa
-    nlr_sum = nlr_summary
-    in_stat = input_stats
-    nlr_sort_bed = sorted_bed
-    cov_parse = parsed_coverage
+    if (params.workflow == "agrenseq") {
+        association = ag_results.association_txt
+        ag_plot = ag_results.association_plot
+        blast_plot = ag_results.bl_plot
+        filtered_contigs = ag_results.contigs
+        candidates_fa = ag_results.cand_fa
+        candidates_bed = ag_results.cand_bed
+        nlr_candidates = ag_results.cand_nlr_pos
+    } else if (params.workflow == "drenseq") {
+        passed = dren_results.passed_genes
+        missed = dren_results.missed_genes
+        transposed_coverage = dren_results.cov
+    } else if (params.workflow == "smrtrenseq") {
+        assembly = smrt_results.contigs_out
+        report = smrt_results.rep
+        stats = smrt_results.stat
+        annotator_text = smrt_results.ann_txt
+        annotator_fa = smrt_results.ann_fa
+        nlr_summary = smrt_results.nlr_sum
+        input_stats = smrt_results.in_stat
+        sorted_bed = smrt_results.nlr_sort_bed
+        parsed_coverage = smrt_results.cov_parse
+    }
 }
 
 output {
-    contigs {
-        path { sample, assembled_contigs -> "${sample}" }
-    }
+    if (params.workflow == "agrenseq") {
+        association_txt {
+        }
 
-    rep {
-        path { sample, assembly_report -> "${sample}" }
-    }
+        association_plot {
+        }
 
-    stat {
-        path { sample, seqkit_out -> "${sample}" }
-    }
+        bl_plot {
+        }
 
-    ann_txt {
-        path { sample, nlr_annotator_txt -> "${sample}" }
-    }
+        contigs_out {
+        }
 
-    ann_fa {
-        path { sample, nlr_annotator_fa -> "${sample}" }
-    }
+        cand_fa {
+        }
 
-    nlr_sum {
-        path { sample, summary_of_nlrs -> "${sample}" }
-    }
+        cand_bed {
+        }
 
-    in_stat {
-        path { sample, stats_input -> "${sample}" }
-    }
+        cand_nlr_pos {
+        }
+    } else if (params.workflow == "drenseq") {
+        passed_genes {
+            path 'diagnostics'
+        }
 
-    nlr_sort_bed {
-        path { sample, sorted_nlr_bed -> "${sample}" }
-    }
+        missed_genes {
+            path 'diagnostics'
+        }
 
-    cov_parse {
-        path { sample, parsed_nlr_coverage -> "${sample}" }
-    }
+        cov {
+        }
+    } else if (params.workflow == "smrtrenseq") {
+        contigs {
+            path { sample, assembled_contigs -> "${sample}" }
+        }
 
-    passed_genes {
-        path 'diagnostics'
-    }
+        rep {
+            path { sample, assembly_report -> "${sample}" }
+        }
 
-    missed_genes {
-        path 'diagnostics'
-    }
+        stat {
+            path { sample, seqkit_out -> "${sample}" }
+        }
 
-    cov {
-    }
+        ann_txt {
+            path { sample, nlr_annotator_txt -> "${sample}" }
+        }
 
-    association_txt {
-    }
+        ann_fa {
+            path { sample, nlr_annotator_fa -> "${sample}" }
+        }
 
-    association_plot {
-    }
+        nlr_sum {
+            path { sample, summary_of_nlrs -> "${sample}" }
+        }
 
-    bl_plot {
-    }
+        in_stat {
+            path { sample, stats_input -> "${sample}" }
+        }
 
-    contigs_out {
-    }
+        nlr_sort_bed {
+            path { sample, sorted_nlr_bed -> "${sample}" }
+        }
 
-    cand_fa {
-    }
-
-    cand_bed {
-    }
-
-    cand_nlr_pos {
+        cov_parse {
+            path { sample, parsed_nlr_coverage -> "${sample}" }
+        }
     }
 }
