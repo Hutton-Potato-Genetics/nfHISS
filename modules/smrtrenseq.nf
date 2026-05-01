@@ -372,17 +372,6 @@ workflow smrtrenseq {
     coverage = CalculateCoverage(bam.join(sorted_bed.join(bai)))
 
     parsed_coverage = ParseCoverage(coverage)
-
-    publish:
-    contigs = assembly
-    rep = report
-    stat = stats
-    ann_txt = annotator_text
-    ann_fa = annotator_fa
-    nlr_sum = nlr_summary
-    in_stat = input_stats
-    nlr_sort_bed = sorted_bed
-    cov_parse = parsed_coverage
 }
 
 output {
