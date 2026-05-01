@@ -123,18 +123,16 @@ Options:
 """
 
 workflow {
-    switch (params.workflow) {
-        case "agrenseq":
-            agrenseq()
-            break
-        case "drenseq":
-            drenseq()
-            break
-        case "smrtrenseq":
-            smrtrenseq()
-            break
-        default:
-            error("Unknown workflow: ${params.workflow}")
-            break
+    if (params.workflow == "agrenseq") {
+        agrenseq()
+        break
+    } else if (params.workflow == "drenseq") {
+        drenseq()
+        break
+    } else if (params.workflow == "smrtrenseq") {
+        smrtrenseq()
+        break
+    } else {
+        error("Unknown workflow: ${params.workflow}")
     }
 }
