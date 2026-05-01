@@ -125,13 +125,10 @@ Options:
 workflow {
     if (params.workflow == "agrenseq") {
         agrenseq()
-        break
     } else if (params.workflow == "drenseq") {
         drenseq()
-        break
     } else if (params.workflow == "smrtrenseq") {
         smrtrenseq()
-        break
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
