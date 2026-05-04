@@ -69,25 +69,25 @@ workflow {
     }
 
     publish:
-    association = association
-    ag_plot = ag_plot
-    blast_plot = blast_plot
-    filtered_contigs = filtered_contigs
-    candidates_fa = candidates_fa
-    candidates_bed = candidates_bed
-    nlr_candidates = nlr_candidates
-    passed = passed
-    missed = missed
-    transposed_coverage = transposed_coverage
-    assembly = assembly
-    report = report
-    stats = stats
-    annotator_text = annotator_text
-    annotator_fa = annotator_fa
-    nlr_summary = nlr_summary
-    input_stats = input_stats
-    sorted_bed = sorted_bed
-    parsed_coverage = parsed_coverage
+    association_txt = association
+    association_plot = ag_plot
+    bl_plot = blast_plot
+    contigs_out = filtered_contigs
+    cand_fa = candidates_fa
+    cand_bed = candidates_bed
+    cand_nlr_pos = nlr_candidates
+    passed_genes = passed
+    missed_genes = missed
+    cov = transposed_coverage
+    contigs = assembly
+    rep = report
+    stat = stats
+    ann_txt = annotator_text
+    ann_fa = annotator_fa
+    nlr_sum = nlr_summary
+    in_stat = input_stats
+    nlr_sort_bed = sorted_bed
+    cov_parse = parsed_coverage
 }
 
 output {
