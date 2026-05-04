@@ -38,69 +38,73 @@ workflow {
 }
 
 output {
-    association_txt {
-    }
+    if (params.workflow == "agrenseq") {
+        association_txt {
+        }
 
-    association_plot {
-    }
+        association_plot {
+        }
 
-    bl_plot {
-    }
+        bl_plot {
+        }
 
-    contigs_out {
-    }
+        contigs_out {
+        }
 
-    cand_fa {
-    }
+        cand_fa {
+        }
 
-    cand_bed {
-    }
+        cand_bed {
+        }
 
-    cand_nlr_pos {
-    }
-    passed_genes {
-        path 'diagnostics'
-    }
+        cand_nlr_pos {
+        }
+    } else if (params.workflow == "drenseq") {
+        passed_genes {
+            path 'diagnostics'
+        }
 
-    missed_genes {
-        path 'diagnostics'
-    }
+        missed_genes {
+            path 'diagnostics'
+        }
 
-    cov {
-    }
-    contigs {
-        path { sample, assembled_contigs -> "${sample}" }
-    }
+        cov {
+        }
+    } else if (params.workflow == "smrtrenseq") {
+        contigs {
+            path { sample, assembled_contigs -> "${sample}" }
+        }
 
-    rep {
-        path { sample, assembly_report -> "${sample}" }
-    }
+        rep {
+            path { sample, assembly_report -> "${sample}" }
+        }
 
-    stat {
-        path { sample, seqkit_out -> "${sample}" }
-    }
+        stat {
+            path { sample, seqkit_out -> "${sample}" }
+        }
 
-    ann_txt {
-        path { sample, nlr_annotator_txt -> "${sample}" }
-    }
+        ann_txt {
+            path { sample, nlr_annotator_txt -> "${sample}" }
+        }
 
-    ann_fa {
-        path { sample, nlr_annotator_fa -> "${sample}" }
-    }
+        ann_fa {
+            path { sample, nlr_annotator_fa -> "${sample}" }
+        }
 
-    nlr_sum {
-        path { sample, summary_of_nlrs -> "${sample}" }
-    }
+        nlr_sum {
+            path { sample, summary_of_nlrs -> "${sample}" }
+        }
 
-    in_stat {
-        path { sample, stats_input -> "${sample}" }
-    }
+        in_stat {
+            path { sample, stats_input -> "${sample}" }
+        }
 
-    nlr_sort_bed {
-        path { sample, sorted_nlr_bed -> "${sample}" }
-    }
+        nlr_sort_bed {
+            path { sample, sorted_nlr_bed -> "${sample}" }
+        }
 
-    cov_parse {
-        path { sample, parsed_nlr_coverage -> "${sample}" }
+        cov_parse {
+            path { sample, parsed_nlr_coverage -> "${sample}" }
+        }
     }
 }
