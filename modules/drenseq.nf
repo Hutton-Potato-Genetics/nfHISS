@@ -109,8 +109,7 @@ process ParseAlignment {
     input:
     tuple val(sample), path(sam)
     output:
-    tuple val(sample), path('aligned.bam')
-    tuple val(sample), path('aligned.bam.bai')
+    tuple val(sample), path('aligned.bam'), path('aligned.bam.bai')
     script:
     """
     samtools sort -l 9 $sam -o aligned.bam -@ $task.cpus
@@ -127,8 +126,7 @@ process StrictFilter {
     maxRetries 3
     time { 10.m * task.attempt }
     input:
-    tuple val(sample), path(bam)
-    tuple val(sample), path(bai)
+    tuple val(sample), path(bam), path(bai)
     output:
     tuple val(sample), path('strict.bam')
     script:
@@ -406,9 +404,9 @@ workflow drenseq {
 
     sam = BowtieAlign(bowtie2_index.first(), trimmed_reads, params.score, params.max_align)
 
-    (bam, bai) = ParseAlignment(sam)
+    bam_bai = ParseAlignment(sam)
 
-    strict_bam = StrictFilter(bam, bai)
+    strict_bam = StrictFilter(bam_bai)
 
     blast_out = BaitsBlasting(params.reference, params.baits, params.identity, params.coverage)
 
