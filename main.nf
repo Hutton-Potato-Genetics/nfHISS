@@ -6,16 +6,16 @@ workflow {
     main:
     if (params.workflow == "agrenseq") {
         ag_results = agrenseq()
-        dren_results = channel.empty()
-        smrt_results = channel.empty
+        dren_results = channel.of( passed_genes, missed_genes, cov )
+        smrt_results = channel.empty( contigs_out, rep, stat, ann_txt, ann_fa, nlr_sum, in_stat, nlr_sort_bed, cov_parse )
     } else if (params.workflow == "drenseq") {
         dren_results = drenseq()
-        ag_results = channel.empty()
-        smrt_results = channel.empty()
+        ag_results = channel.empty( association_txt, association_plot, bl_plot, contigs, cand_fa, cand_bed, can_nlr_pos )
+        smrt_results = channel.empty( contigs_out, rep, stat, ann_txt, ann_fa, nlr_sum, in_stat, nlr_sort_bed, cov_parse )
     } else if (params.workflow == "smrtrenseq") {
         smrt_results = smrtrenseq()
-        ag_results = channel.empty()
-        dren_results = channel.empty()
+        ag_results = channel.empty( association_txt, association_plot, bl_plot, contigs, cand_fa, cand_bed, can_nlr_pos )
+        dren_results = channel.empty( passed_genes, missed_genes, cov )
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
