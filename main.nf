@@ -3,37 +3,41 @@ include { drenseq } from './modules/drenseq.nf'
 include { smrtrenseq } from './modules/smrtrenseq.nf'
 
 workflow {
-    main:
     if (params.workflow == "agrenseq") {
+        main:
         ag_results = agrenseq()
+        publish:
+        association = ag_results.association_txt
+        ag_plot = ag_results.association_plot
+        blast_plot = ag_results.bl_plot
+        filtered_contigs = ag_results.contigs
+        candidates_fa = ag_results.cand_fa
+        candidates_bed = ag_results.cand_bed
+        nlr_candidates = ag_results.cand_nlr_pos
     } else if (params.workflow == "drenseq") {
+        main:
         dren_results = drenseq()
+        publish:
+        passed = dren_results.passed_genes
+        missed = dren_results.missed_genes
+        transposed_coverage = dren_results.cov
     } else if (params.workflow == "smrtrenseq") {
+        main:
         smrt_results = smrtrenseq()
+        publish:
+        assembly = smrt_results.contigs_out
+        report = smrt_results.rep
+        stats = smrt_results.stat
+        annotator_text = smrt_results.ann_txt
+        annotator_fa = smrt_results.ann_fa
+        nlr_summary = smrt_results.nlr_sum
+        input_stats = smrt_results.in_stat
+        sorted_bed = smrt_results.nlr_sort_bed
+        parsed_coverage = smrt_results.cov_parse
     } else {
+        main:
         error("Unknown workflow: ${params.workflow}")
     }
-
-    publish:
-    association = ag_results.association_txt
-    ag_plot = ag_results.association_plot
-    blast_plot = ag_results.bl_plot
-    filtered_contigs = ag_results.contigs
-    candidates_fa = ag_results.cand_fa
-    candidates_bed = ag_results.cand_bed
-    nlr_candidates = ag_results.cand_nlr_pos
-    passed = dren_results.passed_genes
-    missed = dren_results.missed_genes
-    transposed_coverage = dren_results.cov
-    assembly = smrt_results.contigs_out
-    report = smrt_results.rep
-    stats = smrt_results.stat
-    annotator_text = smrt_results.ann_txt
-    annotator_fa = smrt_results.ann_fa
-    nlr_summary = smrt_results.nlr_sum
-    input_stats = smrt_results.in_stat
-    sorted_bed = smrt_results.nlr_sort_bed
-    parsed_coverage = smrt_results.cov_parse
 }
 
 output {
