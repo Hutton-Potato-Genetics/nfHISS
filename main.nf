@@ -5,13 +5,7 @@ include { smrtrenseq } from './modules/smrtrenseq.nf'
 workflow {
     main:
     if (params.workflow == "agrenseq") {
-        association = agrenseq().association_txt
-        ag_plot = agrenseq().association_plot
-        blast_plot = agrenseq().bl_plot
-        filtered_contigs = agrenseq().contigs
-        candidates_fa = agrenseq().cand_fa
-        candidates_bed = agrenseq().cand_bed
-        nlr_candidates = agrenseq().cand_nlr_pos
+        (association, ag_plot, blast_plot, filtered_contigs, candidates_fa, candidates_bed, nlr_candidates) = agrenseq()
         passed = channel.empty()
         missed = channel.empty()
         transposed_coverage = channel.empty()
@@ -32,9 +26,7 @@ workflow {
         candidates_fa = channel.empty()
         candidates_bed = channel.empty()
         nlr_candidates = channel.empty()
-        passed = drenseq().passed_genes
-        missed = drenseq().missed_genes
-        transposed_coverage = drenseq().cov
+        (passed, missed, transposed_coverage) = drenseq()
         assembly = channel.empty()
         report = channel.empty()
         stats = channel.empty()
@@ -55,15 +47,7 @@ workflow {
         passed = channel.empty()
         missed = channel.empty()
         transposed_coverage = channel.empty()
-        assembly = smrtrenseq().contigs_out
-        report = smrtrenseq().rep
-        stats = smrtrenseq().stat
-        annotator_text = smrtrenseq().ann_txt
-        annotator_fa = smrtrenseq().ann_fa
-        nlr_summary = smrtrenseq().nlr_sum
-        input_stats = smrtrenseq().in_stat
-        sorted_bed = smrtrenseq().nlr_sort_bed
-        parsed_coverage = smrtrenseq().cov_parse
+        (assembly, report, stats, annotator_text, annotator_fa, nlr_summary, input_stats, sorted_bed, parsed_coverage) = smrtrenseq()
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
