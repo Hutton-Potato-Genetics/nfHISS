@@ -3,8 +3,8 @@ include { drenseq } from './modules/drenseq.nf'
 include { smrtrenseq } from './modules/smrtrenseq.nf'
 
 workflow {
+    main:
     if (params.workflow == "agrenseq") {
-        main:
         ag_results = agrenseq()
         publish:
         association = ag_results.association_txt
@@ -15,14 +15,12 @@ workflow {
         candidates_bed = ag_results.cand_bed
         nlr_candidates = ag_results.cand_nlr_pos
     } else if (params.workflow == "drenseq") {
-        main:
         dren_results = drenseq()
         publish:
         passed = dren_results.passed_genes
         missed = dren_results.missed_genes
         transposed_coverage = dren_results.cov
     } else if (params.workflow == "smrtrenseq") {
-        main:
         smrt_results = smrtrenseq()
         publish:
         assembly = smrt_results.contigs_out
@@ -35,7 +33,6 @@ workflow {
         sorted_bed = smrt_results.nlr_sort_bed
         parsed_coverage = smrt_results.cov_parse
     } else {
-        main:
         error("Unknown workflow: ${params.workflow}")
     }
 }
