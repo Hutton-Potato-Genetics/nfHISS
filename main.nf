@@ -6,10 +6,16 @@ workflow {
     main:
     if (params.workflow == "agrenseq") {
         ag_results = agrenseq()
+        dren_results = channel.empty()
+        smrt_results = channel.empty
     } else if (params.workflow == "drenseq") {
         dren_results = drenseq()
+        ag_results = channel.empty()
+        smrt_results = channel.empty()
     } else if (params.workflow == "smrtrenseq") {
         smrt_results = smrtrenseq()
+        ag_results = channel.empty()
+        dren_results = channel.empty()
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
