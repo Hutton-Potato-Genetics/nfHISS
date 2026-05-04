@@ -5,13 +5,13 @@ include { smrtrenseq } from './modules/smrtrenseq.nf'
 workflow {
     main:
     if (params.workflow == "agrenseq") {
-        association = agrenseq().out.association_txt
-        ag_plot = agrenseq().out.association_plot
-        blast_plot = agrenseq().out.bl_plot
-        filtered_contigs = agrenseq().out.contigs
-        candidates_fa = agrenseq().out.cand_fa
-        candidates_bed = agrenseq().out.cand_bed
-        nlr_candidates = agrenseq().out.cand_nlr_pos
+        association = agrenseq().association_txt
+        ag_plot = agrenseq().association_plot
+        blast_plot = agrenseq().bl_plot
+        filtered_contigs = agrenseq().contigs
+        candidates_fa = agrenseq().cand_fa
+        candidates_bed = agrenseq().cand_bed
+        nlr_candidates = agrenseq().cand_nlr_pos
         passed = channel.empty()
         missed = channel.empty()
         transposed_coverage = channel.empty()
@@ -32,9 +32,9 @@ workflow {
         candidates_fa = channel.empty()
         candidates_bed = channel.empty()
         nlr_candidates = channel.empty()
-        passed = drenseq().out.passed_genes
-        missed = drenseq().out.missed_genes
-        transposed_coverage = drenseq().out.cov
+        passed = drenseq().passed_genes
+        missed = drenseq().missed_genes
+        transposed_coverage = drenseq().cov
         assembly = channel.empty()
         report = channel.empty()
         stats = channel.empty()
@@ -55,15 +55,15 @@ workflow {
         passed = channel.empty()
         missed = channel.empty()
         transposed_coverage = channel.empty()
-        assembly = smrtrenseq().out.contigs_out
-        report = smrtrenseq().out.rep
-        stats = smrtrenseq().out.stat
-        annotator_text = smrtrenseq().out.ann_txt
-        annotator_fa = smrtrenseq().out.ann_fa
-        nlr_summary = smrtrenseq().out.nlr_sum
-        input_stats = smrtrenseq().out.in_stat
-        sorted_bed = smrtrenseq().out.nlr_sort_bed
-        parsed_coverage = smrtrenseq().out.cov_parse
+        assembly = smrtrenseq().contigs_out
+        report = smrtrenseq().rep
+        stats = smrtrenseq().stat
+        annotator_text = smrtrenseq().ann_txt
+        annotator_fa = smrtrenseq().ann_fa
+        nlr_summary = smrtrenseq().nlr_sum
+        input_stats = smrtrenseq().in_stat
+        sorted_bed = smrtrenseq().nlr_sort_bed
+        parsed_coverage = smrtrenseq().cov_parse
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
