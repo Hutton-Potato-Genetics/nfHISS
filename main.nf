@@ -5,41 +5,89 @@ include { smrtrenseq } from './modules/smrtrenseq.nf'
 workflow {
     main:
     if (params.workflow == "agrenseq") {
-        ag_results = agrenseq()
-        dren_results = channel.of( passed_genes, missed_genes, cov )
-        smrt_results = channel.empty( contigs_out, rep, stat, ann_txt, ann_fa, nlr_sum, in_stat, nlr_sort_bed, cov_parse )
+        association = agrenseq().out.association_txt
+        ag_plot = agrenseq().out.association_plot
+        blast_plot = agrenseq().out.bl_plot
+        filtered_contigs = agrenseq().out.contigs
+        candidates_fa = agrenseq().out.cand_fa
+        candidates_bed = agrenseq().out.cand_bed
+        nlr_candidates = agrenseq().out.cand_nlr_pos
+        passed = channel.empty()
+        missed = channel.empty()
+        transposed_coverage = channel.empty()
+        assembly = channel.empty()
+        report = channel.empty()
+        stats = channel.empty()
+        annotator_text = channel.empty()
+        annotator_fa = channel.empty()
+        nlr_summary = channel.empty()
+        input_stats = channel.empty()
+        sorted_bed = channel.empty()
+        parsed_coverage = channel.empty()
     } else if (params.workflow == "drenseq") {
-        dren_results = drenseq()
-        ag_results = channel.empty( association_txt, association_plot, bl_plot, contigs, cand_fa, cand_bed, can_nlr_pos )
-        smrt_results = channel.empty( contigs_out, rep, stat, ann_txt, ann_fa, nlr_sum, in_stat, nlr_sort_bed, cov_parse )
+        association = channel.empty()
+        ag_plot = channel.empty()
+        blast_plot = channel.empty()
+        filtered_contigs = channel.empty()
+        candidates_fa = channel.empty()
+        candidates_bed = channel.empty()
+        nlr_candidates = channel.empty()
+        passed = drenseq().out.passed_genes
+        missed = drenseq().out.missed_genes
+        transposed_coverage = drenseq().out.cov
+        assembly = channel.empty()
+        report = channel.empty()
+        stats = channel.empty()
+        annotator_text = channel.empty()
+        annotator_fa = channel.empty()
+        nlr_summary = channel.empty()
+        input_stats = channel.empty()
+        sorted_bed = channel.empty()
+        parsed_coverage = channel.empty()
     } else if (params.workflow == "smrtrenseq") {
-        smrt_results = smrtrenseq()
-        ag_results = channel.empty( association_txt, association_plot, bl_plot, contigs, cand_fa, cand_bed, can_nlr_pos )
-        dren_results = channel.empty( passed_genes, missed_genes, cov )
+        association = channel.empty()
+        ag_plot = channel.empty()
+        blast_plot = channel.empty()
+        filtered_contigs = channel.empty()
+        candidates_fa = channel.empty()
+        candidates_bed = channel.empty()
+        nlr_candidates = channel.empty()
+        passed = channel.empty()
+        missed = channel.empty()
+        transposed_coverage = channel.empty()
+        assembly = smrtrenseq().out.contigs_out
+        report = smrtrenseq().out.rep
+        stats = smrtrenseq().out.stat
+        annotator_text = smrtrenseq().out.ann_txt
+        annotator_fa = smrtrenseq().out.ann_fa
+        nlr_summary = smrtrenseq().out.nlr_sum
+        input_stats = smrtrenseq().out.in_stat
+        sorted_bed = smrtrenseq().out.nlr_sort_bed
+        parsed_coverage = smrtrenseq().out.cov_parse
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
 
     publish:
-    association = ag_results.association_txt
-    ag_plot = ag_results.association_plot
-    blast_plot = ag_results.bl_plot
-    filtered_contigs = ag_results.contigs
-    candidates_fa = ag_results.cand_fa
-    candidates_bed = ag_results.cand_bed
-    nlr_candidates = ag_results.cand_nlr_pos
-    passed = dren_results.passed_genes
-    missed = dren_results.missed_genes
-    transposed_coverage = dren_results.cov
-    assembly = smrt_results.contigs_out
-    report = smrt_results.rep
-    stats = smrt_results.stat
-    annotator_text = smrt_results.ann_txt
-    annotator_fa = smrt_results.ann_fa
-    nlr_summary = smrt_results.nlr_sum
-    input_stats = smrt_results.in_stat
-    sorted_bed = smrt_results.nlr_sort_bed
-    parsed_coverage = smrt_results.cov_parse
+    association = association
+    ag_plot = ag_plot
+    blast_plot = blast_plot
+    filtered_contigs = filtered_contigs
+    candidates_fa = candidates_fa
+    candidates_bed = candidates_bed
+    nlr_candidates = nlr_candidates
+    passed = passed
+    missed = missed
+    transposed_coverage = transposed_coverage
+    assembly = assembly
+    report = report
+    stats = stats
+    annotator_text = annotator_text
+    annotator_fa = annotator_fa
+    nlr_summary = nlr_summary
+    input_stats = input_stats
+    sorted_bed = sorted_bed
+    parsed_coverage = parsed_coverage
 }
 
 output {
