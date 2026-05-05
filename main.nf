@@ -10,7 +10,7 @@ workflow {
     } else if (params.workflow == "drenseq") {
         (association, ag_plot, blast_plot, filtered_contigs, candidates_fa, candidates_bed, nlr_candidates, assembly, report, stats, annotator_text, annotator_fa, nlr_summary, input_stats, sorted_bed, parsed_coverage) = channel.empty()
     } else if (params.workflow == "smrtrenseq") {
-        (association, ag_plot, blast_plot, filtered_contigs, candidates_fam candidates_bed, nlr_candidates, passed, missed, transposed_coverage) = channel.empty()
+        (association, ag_plot, blast_plot, filtered_contigs, candidates_fa, candidates_bed, nlr_candidates, passed, missed, transposed_coverage) = channel.empty()
         (assembly, report, stats, annotator_text, annotator_fa, nlr_summary, input_stats, sorted_bed, parsed_coverage) = smrtrenseq()
     } else {
         error("Unknown workflow: ${params.workflow}")
