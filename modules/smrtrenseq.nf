@@ -1,4 +1,4 @@
-process TrimReadsSMRTRenSeq {
+process TrimReads {
     container 'docker://quay.io/biocontainers/cutadapt:4.9--py312hf67a6ed_0'
     scratch true
     cpus 2
@@ -345,7 +345,7 @@ workflow smrtrenseq {
     main:
     reads = channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
     
-    trimmed_reads = TrimReadsSMRTRenSeq(reads, params.five_prime, params.three_prime)
+    trimmed_reads = TrimReads(reads, params.five_prime, params.three_prime)
 
     (assembly, report) = CanuAssemble(trimmed_reads, params.genome_size, params.max_input_coverage)
 

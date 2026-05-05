@@ -19,6 +19,7 @@ workflow {
         sorted_bed = channel.empty()
         parsed_coverage = channel.empty()
     } else if (params.workflow == "drenseq") {
+        (passed, missed, transposed_coverage) = drenseq()
         association = channel.empty()
         ag_plot = channel.empty()
         blast_plot = channel.empty()
@@ -35,8 +36,8 @@ workflow {
         input_stats = channel.empty()
         sorted_bed = channel.empty()
         parsed_coverage = channel.empty()
-        (passed, missed, transposed_coverage) = drenseq()
     } else if (params.workflow == "smrtrenseq") {
+        (assembly, report, stats, annotator_text, annotator_fa, nlr_summary, input_stats, sorted_bed, parsed_coverage) = smrtrenseq()
         association = channel.empty()
         ag_plot = channel.empty()
         blast_plot = channel.empty()
@@ -47,7 +48,6 @@ workflow {
         passed = channel.empty()
         missed = channel.empty()
         transposed_coverage = channel.empty()
-        (assembly, report, stats, annotator_text, annotator_fa, nlr_summary, input_stats, sorted_bed, parsed_coverage) = smrtrenseq()
     } else {
         error("Unknown workflow: ${params.workflow}")
     }
