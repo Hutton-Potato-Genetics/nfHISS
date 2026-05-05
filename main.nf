@@ -17,47 +17,47 @@ workflow {
     }
 
     publish:
-    association_txt = association
+    association_text = association
     association_plot = ag_plot
-    bl_plot = blast_plot
+    blast_location_plot = blast_plot
     contigs_out = filtered_contigs
-    cand_fa = candidates_fa
-    cand_bed = candidates_bed
-    cand_nlr_pos = nlr_candidates
+    candidates_fasta = candidates_fa
+    candidates_location_bed = candidates_bed
+    candidates_nlr_positive_fasta = nlr_candidates
     passed_genes = passed
     missed_genes = missed
-    cov = transposed_coverage
-    contigs = assembly
-    rep = report
-    stat = stats
-    ann_txt = annotator_text
-    ann_fa = annotator_fa
-    nlr_sum = nlr_summary
-    in_stat = input_stats
-    nlr_sort_bed = sorted_bed
-    cov_parse = parsed_coverage
+    coverage = transposed_coverage
+    assembled_contigs = assembly
+    assembly_report = report
+    asssembly_stats = stats
+    nlr_annotator_text = annotator_text
+    nlr_annotator_fasta = annotator_fa
+    nlr_annotator_summary = nlr_summary
+    input_reads_stats = input_stats
+    nlr_annotator_sorted_bed = sorted_bed
+    nlr_coverage = parsed_coverage
 }
 
 output {
-    association_txt {
+    association_text {
     }
 
     association_plot {
     }
 
-    bl_plot {
+    blast_location_plot {
     }
 
     contigs_out {
     }
 
-    cand_fa {
+    candidates_fasta {
     }
 
-    cand_bed {
+    candidates_location_bed {
     }
 
-    cand_nlr_pos {
+    candidates_nlr_positive_fasta {
     }
     passed_genes {
         path 'diagnostics'
@@ -67,41 +67,42 @@ output {
         path 'diagnostics'
     }
 
-    cov {
+    coverage {
     }
-    contigs {
+
+    assembled_contigs {
         path { sample, assembled_contigs -> "${sample}" }
     }
 
-    rep {
+    assembly_report {
         path { sample, assembly_report -> "${sample}" }
     }
 
-    stat {
+    asssembly_stats {
         path { sample, seqkit_out -> "${sample}" }
     }
 
-    ann_txt {
+    nlr_annotator_text {
         path { sample, nlr_annotator_txt -> "${sample}" }
     }
 
-    ann_fa {
+    nlr_annotator_fasta {
         path { sample, nlr_annotator_fa -> "${sample}" }
     }
 
-    nlr_sum {
+    nlr_annotator_summary {
         path { sample, summary_of_nlrs -> "${sample}" }
     }
 
-    in_stat {
+    input_reads_stats {
         path { sample, stats_input -> "${sample}" }
     }
 
-    nlr_sort_bed {
+    nlr_annotator_sorted_bed {
         path { sample, sorted_nlr_bed -> "${sample}" }
     }
 
-    cov_parse {
+    nlr_coverage {
         path { sample, parsed_nlr_coverage -> "${sample}" }
     }
 }
