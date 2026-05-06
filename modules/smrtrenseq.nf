@@ -34,7 +34,6 @@ process CanuAssemble {
     output:
     tuple val(sample), path("assembly/${sample}_assembly.contigs.fasta")
     tuple val(sample), path("assembly/${sample}_assembly.report")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     canu \
@@ -60,7 +59,6 @@ process SeqkitStats {
     tuple val(sample), path(assembly)
     output:
     tuple val(sample), path("${sample}_statistics.txt")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     seqfu stats -b $assembly | sed 's/_assembly\\.contigs//g' > ${sample}_statistics.txt
@@ -117,7 +115,6 @@ process NLRAnnotator {
     output:
     tuple val(sample), path("${sample}_NLR_annotator.txt")
     tuple val(sample), path("${sample}_NLR_annotator.fa")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     nlr_annotator.sh -Xmx${task.memory.toMega()}M -i $parser_xml -o ${sample}_NLR_annotator.txt -f $assembly ${sample}_NLR_annotator.fa $flanking
@@ -136,7 +133,6 @@ process SummariseNLRs {
     tuple val(sample), path(annotator_text)
     output:
     tuple val(sample), path("${sample}_NLR_summary.txt")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -197,7 +193,6 @@ process InputStatistics {
     tuple val(sample), path(report)
     output:
     tuple val(sample), path("${sample}_input_stats.txt")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     Reads=\$(cat $report | grep -m 1 'reads' | cut -f5 -d ' ')
@@ -245,7 +240,6 @@ process SortNLRBed {
     tuple val(sample), path(annotator_bed)
     output:
     tuple val(sample), path("${sample}_NLR_Annotator_sorted.bed")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     sort -k1,1V -k2,2n -k3,3n $annotator_bed > ${sample}_NLR_Annotator_sorted.bed
@@ -321,7 +315,6 @@ process ParseCoverage {
     tuple val(sample), path(coverage_text)
     output:
     tuple val(sample), path("${sample}_coverage_parsed.txt")
-    publishDir "results/${sample}", mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -342,7 +335,8 @@ process ParseCoverage {
 }
 
 workflow smrtrenseq {
-    reads = Channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
+    main:
+    reads = channel.fromPath(params.reads).splitCsv(header: true, sep: "\t").map { row -> tuple(row.sample, file(row.reads)) }
     
     trimmed_reads = TrimReads(reads, params.five_prime, params.three_prime)
 
@@ -371,4 +365,15 @@ workflow smrtrenseq {
     coverage = CalculateCoverage(bam.join(sorted_bed.join(bai)))
 
     parsed_coverage = ParseCoverage(coverage)
+
+    emit:
+    contigs_out = assembly
+    rep = report
+    stat = stats
+    ann_txt = annotator_text
+    ann_fa = annotator_fa
+    nlr_sum = nlr_summary
+    in_stat = input_stats
+    nlr_sort_bed = sorted_bed
+    cov_parse = parsed_coverage
 }

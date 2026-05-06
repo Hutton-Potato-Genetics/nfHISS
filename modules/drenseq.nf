@@ -109,8 +109,7 @@ process ParseAlignment {
     input:
     tuple val(sample), path(sam)
     output:
-    tuple val(sample), path('aligned.bam')
-    tuple val(sample), path('aligned.bam.bai')
+    tuple val(sample), path('aligned.bam'), path('aligned.bam.bai')
     script:
     """
     samtools sort -l 9 $sam -o aligned.bam -@ $task.cpus
@@ -127,8 +126,7 @@ process StrictFilter {
     maxRetries 3
     time { 10.m * task.attempt }
     input:
-    tuple val(sample), path(bam)
-    tuple val(sample), path(bai)
+    tuple val(sample), path(bam), path(bai)
     output:
     tuple val(sample), path('strict.bam')
     script:
@@ -248,7 +246,6 @@ process BaitBlastCheck {
     output:
     path 'passed_genes.txt'
     path 'missing_genes.txt'
-    publishDir 'results/diagnostics', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -377,7 +374,6 @@ process TransposeCombinedCoverage {
     path all_coverage_values
     output:
     path 'all_coverage_values_transposed.txt'
-    publishDir 'results', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -390,13 +386,14 @@ process TransposeCombinedCoverage {
 }
 
 workflow drenseq {
-    bowtie2_index = Channel
+    main:
+    bowtie2_index = channel
         .fromPath(params.reference) \
         | BowtieBuild
 
     trimmed_bed = TrimBed(file(params.bed))
 
-    reads = Channel
+    reads = channel
         .fromPath(params.reads)
         .splitCsv(header: true, sep: "\t")
         .map { row -> tuple(row.sample, file(row.FRead), file(row.RRead)) }
@@ -405,9 +402,9 @@ workflow drenseq {
 
     sam = BowtieAlign(bowtie2_index.first(), trimmed_reads, params.score, params.max_align)
 
-    (bam, bai) = ParseAlignment(sam)
+    bai = ParseAlignment(sam)
 
-    strict_bam = StrictFilter(bam, bai)
+    strict_bam = StrictFilter(bai)
 
     blast_out = BaitsBlasting(params.reference, params.baits, params.identity, params.coverage)
 
@@ -428,4 +425,9 @@ workflow drenseq {
     all_coverage_values = CombineCoverageValues(sample_coverage.collect(), nlr_headers, params.ulimit)
 
     transposed_coverage = TransposeCombinedCoverage(all_coverage_values)
+
+    emit:
+    passed_genes = passed
+    missed_genes = missed
+    cov = transposed_coverage
 }

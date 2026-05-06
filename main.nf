@@ -2,139 +2,143 @@ include { agrenseq } from './modules/agrenseq.nf'
 include { drenseq } from './modules/drenseq.nf'
 include { smrtrenseq } from './modules/smrtrenseq.nf'
 
-help_message = """
-Needin' some help? ------------------------------------------------------------
-
-There are currently three workflows available in this pipeline:
-- smrtrenseq: for assembling HiFi RenSeq reads into contigs
-- agrenseq: for carrying out association analysis from renseq data
-- drenseq: for calculating read coverage of known resistance genes
-
-agrenseq ----------------------------------------------------------------------
-
-Usage:
-    nextflow run Hutton-Potato-Genetics/nfHISS --workflow agrenseq \
-                                               --association_reference <association_reference> \
-                                               --reads <read_scores> \
-                                               --adaptor_1 <barcode_fasta_1> \
-                                               --adaptor_2 <barcode_fasta_2> \
-                                               --blast_reference <blast_reference> \
-                                               --threshold <association_threshold> \
-                                               --title <plot_title> \
-                                               --annotator_bed <annotator_bed>
-
-Options:
-    --association_reference <association_reference>     Path to the association
-                                                        reference fasta
-    --reads <read_scores>                               Path to the reads file 
-                                                        - tab-separated file
-                                                        with columns 'sample',
-                                                        'R1', 'R2', and 'score'
-    --adaptor_1 <barcode_fasta_1>                       Path to first barcode
-                                                        fasta
-    --adaptor_2 <barcode_fasta_2>                       Path to second barcode
-                                                        fasta
-    --blast_reference <blast_reference>                 Path to the blast
-                                                        reference fasta
-    --threshold <association_threshold>                 Value to use as
-                                                        significance threshold
-                                                        in the association plot
-    --title <plot_title>                                Title for association
-                                                        plot
-    --annotator_bed <bed_file_of_nlrs>                  Bed file of NLR
-                                                        locations used to
-                                                        identify candidate NLRs
-
-drenseq -----------------------------------------------------------------------
-
-Usage:
-    nextflow run Hutton-Potato-Genetics/nfHISS --workflow drenseq \
-                                               --reference <reference> \
-                                               --reads <read_scores> \
-                                               --bed <bed_file> \
-                                               --adaptor_1 <barcode_fasta_1> \
-                                               --adaptor_2 <barcode_fasta_2> \
-                                               --score <bowtie2_score_min> \
-                                               --max_align <maximum_allowed_alignments> \
-                                               --baits <renseq_baits> \
-                                               --identity <percent_identity> \
-                                               --coverage <coverage> \
-                                               --flank <flanking_region> \
-                                               --ulimit <ulimit>
-
-Options:
-    --reference <reference>                     Path to the reference fasta
-    --reads <read_file>                         Path to the reads file -
-                                                tab-separated with columns
-                                                'sample','FRead', 'RRead'
-    --bed <bed_file>                            Path to the bed file
-    --adaptor_1 <barcode_fasta_1>               Path to first barcode fasta
-    --adaptor_2 <barcode_fasta_2>               Path to second barcode fasta
-    --score <bowtie2_score_min>                 Parameter for BowTie2 to
-                                                control allowed mismatch rate
-    --max_align <maximum_allowed_alignments>    Parameter for BowTie2 to control
-                                                maximum alignments allowed
-    --baits <renseq_baits>                      Path to fasta file of RenSeq
-                                                baits
-    --identity <percent_identity>               Parameter for blastn - minimum
-                                                percentage identity
-    --coverage <coverage>                       Parameter for blastn - minimum
-                                                coverage of hit
-    --flank <flanking_region>                   Number of bases to take either
-                                                side of a blastn hit
-    --ulimit <ulimit>                           Set an increased ulimit with
-                                                large sample sizes
-
-smrtrenseq --------------------------------------------------------------------
-
-Usage:
-    nextflow run Hutton-Potato-Genetics/nfHISS --workflow smrtrenseq \
-                                               --reads <reads_locations_tsv> \
-                                               --genome_size
-                                               <approximate_genome_size> \
-                                               --max_input_coverage
-                                               <maximum_input_coverage> \
-                                               --flanking <flanking_bases> \
-                                               --five_prime <5'_to_trim> \
-                                               --three_prime <3'_to_trim>
-
-Options:
-    --reads <reads_locations_tsv>                   Path to the read locations
-                                                    file - tab-separated file
-                                                    with columns 'sample' and
-                                                    'reads'
-    --genome_size <approximate_genome_size>         Approximate expected
-                                                    assembly size - parameter
-                                                    for HiCanu
-    --max_input_coverage <maximum_input_coverage>   Maximum input coverage used
-                                                    by HiCanu. If you have more
-                                                    coverage than this, HiCanu
-                                                    will randomly downsample
-                                                    your input. Recommend
-                                                    setting this to an excess
-                                                    of your coverage.
-    --flanking <flanking_bases>                     Number of bases to use as a
-                                                    flanking region for NLR
-                                                    Annotators fasta output
-    --five_prime <5'_to_trim>                       Sequence to be trimmed from
-                                                    5' end of reads
-    --three_prime <3'_to_trim>                      Sequence to be trimmed from
-                                                    3' end of reads
-"""
-
 workflow {
-    switch (params.workflow) {
-        case "agrenseq":
-            agrenseq()
-            break
-        case "drenseq":
-            drenseq()
-            break
-        case "smrtrenseq":
-            smrtrenseq()
-            break
-        default:
-            error("Unknown workflow: ${params.workflow}")
-            break
+    main:
+    if (params.workflow == "agrenseq") {
+        (association, ag_plot, blast_plot, filtered_contigs, candidates_fa, candidates_bed, nlr_candidates) = agrenseq()
+        passed = channel.empty()
+        missed = channel.empty()
+        transposed_coverage = channel.empty()
+        assembly = channel.empty()
+        report = channel.empty()
+        stats = channel.empty()
+        annotator_text = channel.empty()
+        annotator_fa = channel.empty()
+        nlr_summary = channel.empty()
+        input_stats = channel.empty()
+        sorted_bed = channel.empty()
+        parsed_coverage = channel.empty()
+    } else if (params.workflow == "drenseq") {
+        (passed, missed, transposed_coverage) = drenseq()
+        association = channel.empty()
+        ag_plot = channel.empty()
+        blast_plot = channel.empty()
+        filtered_contigs = channel.empty()
+        candidates_fa = channel.empty()
+        candidates_bed = channel.empty()
+        nlr_candidates = channel.empty()
+        assembly = channel.empty()
+        report = channel.empty()
+        stats = channel.empty()
+        annotator_text = channel.empty()
+        annotator_fa = channel.empty()
+        nlr_summary = channel.empty()
+        input_stats = channel.empty()
+        sorted_bed = channel.empty()
+        parsed_coverage = channel.empty()
+    } else if (params.workflow == "smrtrenseq") {
+        (assembly, report, stats, annotator_text, annotator_fa, nlr_summary, input_stats, sorted_bed, parsed_coverage) = smrtrenseq()
+        association = channel.empty()
+        ag_plot = channel.empty()
+        blast_plot = channel.empty()
+        filtered_contigs = channel.empty()
+        candidates_fa = channel.empty()
+        candidates_bed = channel.empty()
+        nlr_candidates = channel.empty()
+        passed = channel.empty()
+        missed = channel.empty()
+        transposed_coverage = channel.empty()
+    } else {
+        error("Unknown workflow: ${params.workflow}")
+    }
+
+    publish:
+    association_text = association
+    association_plot = ag_plot
+    blast_location_plot = blast_plot
+    contigs_out = filtered_contigs
+    candidates_fasta = candidates_fa
+    candidates_location_bed = candidates_bed
+    candidates_nlr_positive_fasta = nlr_candidates
+    passed_genes = passed
+    missed_genes = missed
+    coverage = transposed_coverage
+    assembled_contigs = assembly
+    assembly_report = report
+    asssembly_stats = stats
+    nlr_annotator_text = annotator_text
+    nlr_annotator_fasta = annotator_fa
+    nlr_annotator_summary = nlr_summary
+    input_reads_stats = input_stats
+    nlr_annotator_sorted_bed = sorted_bed
+    nlr_coverage = parsed_coverage
+}
+
+output {
+    association_text {
+    }
+
+    association_plot {
+    }
+
+    blast_location_plot {
+    }
+
+    contigs_out {
+    }
+
+    candidates_fasta {
+    }
+
+    candidates_location_bed {
+    }
+
+    candidates_nlr_positive_fasta {
+    }
+    passed_genes {
+        path 'diagnostics'
+    }
+
+    missed_genes {
+        path 'diagnostics'
+    }
+
+    coverage {
+    }
+
+    assembled_contigs {
+        path { sample, assembled_contigs -> "${sample}" }
+    }
+
+    assembly_report {
+        path { sample, assembly_report -> "${sample}" }
+    }
+
+    asssembly_stats {
+        path { sample, seqkit_out -> "${sample}" }
+    }
+
+    nlr_annotator_text {
+        path { sample, nlr_annotator_txt -> "${sample}" }
+    }
+
+    nlr_annotator_fasta {
+        path { sample, nlr_annotator_fa -> "${sample}" }
+    }
+
+    nlr_annotator_summary {
+        path { sample, summary_of_nlrs -> "${sample}" }
+    }
+
+    input_reads_stats {
+        path { sample, stats_input -> "${sample}" }
+    }
+
+    nlr_annotator_sorted_bed {
+        path { sample, sorted_nlr_bed -> "${sample}" }
+    }
+
+    nlr_coverage {
+        path { sample, parsed_nlr_coverage -> "${sample}" }
     }
 }
