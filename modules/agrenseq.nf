@@ -94,7 +94,6 @@ process RunAssociation {
     path nlrparser
     output:
     path 'agrenseq_result.txt'
-    // publishDir 'results', mode: 'copy'
     script:
     """
     run_association.sh ${task.memory.toGiga()}G -i $presence_matrix -n $nlrparser -p $phenotype -a $reference -o agrenseq_result.txt
@@ -174,7 +173,6 @@ process Plot {
     path 'AgRenSeq_plot.png'
     path 'Blast_plot.png'
     path 'filtered_contigs.txt'
-    // publishDir 'results', mode: 'copy'
     script:
     """
     plot.R $association_results $threshold $title filtered_contigs.txt AgRenSeq_plot.png
@@ -197,7 +195,6 @@ process FinalFilePrep {
     path 'candidates.fa'
     path 'candidates.bed'
     path 'nlr_annotator_positive_candidates.fa'
-    // publishDir 'results', mode: 'copy'
     script:
     """
     awk '/^>/ {printf("\\n%s\\n",\$0);next; } { printf("%s",\$0);}  END {printf("\\n");}' < $association_reference | tail -n +2 > unwrapped.fa

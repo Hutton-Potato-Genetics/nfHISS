@@ -246,7 +246,6 @@ process BaitBlastCheck {
     output:
     path 'passed_genes.txt'
     path 'missing_genes.txt'
-    // publishDir 'results/diagnostics', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
@@ -375,7 +374,6 @@ process TransposeCombinedCoverage {
     path all_coverage_values
     output:
     path 'all_coverage_values_transposed.txt'
-    // publishDir 'results', mode: 'copy'
     script:
     """
     #!/usr/bin/env python3
