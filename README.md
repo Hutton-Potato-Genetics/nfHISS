@@ -42,7 +42,7 @@ All paths MUST be absolute paths.
 
 ### smrtrenseq
 
-```bash
+```
 --reads <reads_locations_tsv>                   Path to read locations file - tab separated file
                                                     with columns 'sample' and 'reads'
 --genome_size <appoximate_genome_size>          Approximate assembly size passed to HiCanu
@@ -55,7 +55,7 @@ All paths MUST be absolute paths.
 
 ### agrenseq
 
-```bash
+```
 --association_reference <association_reference>     Path to fasta file of assembled contigs for
                                                     association
 --reads <read_scores>                               Path to the reads file - tab-separated file
@@ -78,7 +78,7 @@ All paths MUST be absolute paths.
 
 ### drenseq
 
-```bash
+```
 --reference <reference_fasta>               Path to reference fasta file of candidate sequences
 --reads <reads_file>                        Path to reads file - tab-separated with columns
                                                 'sample','FRead', 'RRead'
